@@ -1,0 +1,31 @@
+cara menginstal laravel brazeee
+
+1. buat folder
+
+
+2. buka folder tersebut dengan visual studio code
+
+
+
+3. ketik ini di terminal :
+composer require laravel/breeze --dev
+
+
+
+
+4. ketika sudah menjalankan nomer 3, buka terminal kembali dan ketikan :
+php artisan breeze:install
+
+
+
+
+
+
+
+
+
+
+
+
+
+

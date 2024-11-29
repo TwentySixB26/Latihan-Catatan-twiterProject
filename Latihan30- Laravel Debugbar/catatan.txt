@@ -1,0 +1,18 @@
+1. cara menginstal laravel debuger adalah buka terminal dan ketikan :
+composer require barryvdh/laravel-debugbar --dev
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,71 @@
+memperbaiki bagian search di pojok kanan atas agar pagination nya tidak rusak, maksud rusak disini adalah misal total page nya ada 10 dan ketika mencari sesuatu di search page nya hanya ada 5 tetapi jika kita mengklik 3 maka akan kembali menjadi 10 nah itu yang menjadi kendala,kita ingin masih 5 karena kita masih mencari sesuatu yang ada di search tersebut :
+
+
+
+1. buka file dashboard.blade.php dan tambahkan code withQueryString() pada pagination seperti ini:
+
+{{-- pagination --}}
+{{ $ideas->withQueryString()->links() }}
+
+
+
+
+======================================================================================================
+
+
+
+cara agar ketika menuliskan sesuatu di search dan menekan enter/cari maka value nya masih ada caranya adalah : 
+
+1.buka file searchBar.blade.php dan berikan code :
+value="{{ request('search', '') }}"  
+
+untuk full codenya adalah : 
+<input value="{{ request('search', '') }}" placeholder="..." class="form-control w-100" type="text" name="search" id="search">
+
+
+
+
+=====================================================================================================
+
+
+menangani search jika yang dicari tidak ada :  
+
+
+1. buka file dashboard.blade.php dan tambahkan code if else jika datanya kosong atau ada, codenya adalah : 
+@if (count($ideas) > 0)
+    //jika data ada
+@else 
+    //jika data tidak ada
+@endif
+
+
+contoh full code :
+
+{{-- jika data ada--}}
+@if (count($ideas) > 0)
+    @foreach ($ideas as $idea)
+        <div class="mt-3">
+            @include('shared/ideaCard')
+        </div>
+    @endforeach
+{{-- jika data tidak ada --}}
+@else
+    Pencarian "{{ request('search') }}" tidak ditemukan.
+@endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

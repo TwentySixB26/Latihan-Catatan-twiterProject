@@ -1,0 +1,128 @@
+membuat pivot table untuk membuat kerangka nya :
+
+1. buka terminal dan ketikan :
+php artisan make:migration create_follower_user_table --create
+
+pivot table biasanya tidak memerlukan moedel, dan pivot tabel relasi keduanya adalah many to many tidak bisa one to many.
+
+
+
+
+
+2. buka file ....create_follower_user_table dan buat scema nya :
+
+Schema::create('follower_user', function (Blueprint $table) {
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('follower_id')->constrained('users')->cascadeOnDelete();
+            $table->timestamps();
+        });
+
+
+
+
+3. buka terminal dan lakukan :
+php artisan migrate:fresh
+
+
+
+
+
+4. buka file model/user.php dan buat method untuk menangani pivot tabel tadi  :
+
+User::class = model yg ada di db yg ingin dibentuk relasinya
+follower_user = nama relasi yang berhubungan 
+follower_id  = penguna yang di ikuti (foreign key)
+user_id = penguna yang mengikuti 
+//kenapa follower_id bisa jadi foreign key? karena dia yang datanya diambil,dalam konteks mengikuti itu seperti ini jika kita ingin mengikuti user maka kita harus mengambil data user yang di ikuti oleh sebab itu follower_id menjadi foreign key karena data nya akan diambil agar bisa diproses oleh user_id
+
+
+
+public function followings(){
+        return $this->belongsToMany(User::class,'follower_user','follower_id' , 'user_id')->withTimestamps();
+    }
+
+
+
+    public function followers(){
+        return $this->belongsToMany(User::class,'follower_user','user_id' , 'follower_id')->withTimestamps();
+    }
+
+
+
+
+5. buat controller baru :
+php artisan make:controller FollowController 
+
+
+
+
+6. buka route dan tambahkan route baru :
+Route::post('user/{user}/follow',[FollowController::class,'follow'])->middleware('auth')->name('users.follow') ;
+Route::post('user/{user}/unfollow',[FollowController::class,'unfollow'])->middleware('auth')->name('users.unfollow') ;
+
+
+
+
+7. buat method follow dan unfollow pada file FollowController:
+
+public function follow(User $user){
+        $follower = auth()->user();// Mendapatkan pengguna yang sedang login (pengikut).
+
+        $follower->followings()->attach($user); // Menambahkan pengguna yang ingin diikuti ke daftar "followings" pengguna yang login.
+        return redirect('users/' . $user->id)->with('success',"Followed is Susscesfully!") ; // Mengarahkan kembali ke halaman profil dengan pesan sukses.
+    }
+
+
+
+public function unfollow(User $user){
+        $follower = auth()->user();// Mendapatkan pengguna yang sedang login (pengikut).
+
+        $follower->followings()->detach($user); // Menambahkan pengguna yang ingin diikuti ke daftar "followings" pengguna yang login.
+        return redirect('users/' . $user->id)->with('success',"Followed is Susscesfully!") ; // Mengarahkan kembali ke halaman profil dengan pesan sukses.
+    }
+
+
+
+
+
+8. buka user-edit-card.blade.php dan hapus bagian :
+@auth()
+    @if (Auth::id() !== $user->id)
+        <div class="mt-3">
+            <button class="btn btn-primary btn-sm"> Follow </button>
+        </div>
+    @endif
+@endauth
+
+
+
+
+9. buka file user-card.blade.php tambahkan code ini untuk menangani follow dan unfollow:
+<form action="user/{{ $user->id }}/follow" method="post">
+    @csrf
+    <button type="submit" class="btn btn-primary btn-sm"> Follow </button>
+</form>
+
+
+
+
+10. buka file user.php dan buat method baru :
+public function follows(User $user){
+        return $this->followings()->where('user_id' , $user->id)->exists();
+    }
+
+
+
+11. buka file user-card.blade.php dan tambahkan code/ganti codenya menjadi:
+
+@if (Auth::user()->follows($user))
+    <form action="{{ $user->id }}/unfollow" method="post">
+        @csrf
+        <button type="submit" class="btn btn-danger btn-sm" > UnFollow </button>
+    </form>
+@else
+    <form action="{{ $user->id }}/follow" method="post">
+        @csrf
+        <button type="submit" class="btn btn-primary btn-sm" > Follow </button>
+    </form>
+@endif

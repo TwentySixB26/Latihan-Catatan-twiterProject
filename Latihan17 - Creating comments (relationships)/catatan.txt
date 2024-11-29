@@ -1,0 +1,114 @@
+memperbaiki display coment 
+
+1. buat view baru yang mempunyai nama shared/coments.blade.php 
+
+
+2. buka file coments.blade.php dan tambahkan code ini, code tersebut diambil dari file ideaCard.blade.php di cut dan dipindahkan ke file coments.blade.php :
+
+
+
+3. buka file ideaCard.blade.php dan tambahkan code ini agar dapat mengambil code yang ada coments.blade.php seperti ini : 
+@include('shared/coments')
+
+
+
+===============================================================================================
+
+
+melakukan relation ship antara coment dan post 
+
+1. buka terminal dan ketikan ini agar membuat model,migrasi dan controller sekaligus  :
+php artisan make:model Coment -m -c 
+
+
+
+
+2. buka file migration dari coment tadi untuk membuat scema databsenya seperti ini :
+
+Schema::create('coments', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('idea_id')->constrained()->cascadeOnDelete() ;
+    $table->string('coment') ;
+    $table->timestamps();
+});
+
+
+
+
+3. kirim scema dan buat db nya mengunakan php artisan : 
+php artisan migrate 
+
+
+
+
+4. buka file web.php untuk menangani route nya seperti ini : 
+Route::post('/idea/{idea}/coments', [ComentController::class , 'store']) ;
+
+
+
+
+5. buka file coments.blade.php dan berikan code form seperti ini :
+
+    <form action="/idea/{{ $idea->id }}/coments" method="post">
+        @csrf
+        <div class="mb-3">
+            <textarea class="fs-6 form-control" rows="1" name="coment"></textarea>
+        </div>
+        <div>
+            <button class="btn btn-primary btn-sm" type="submit"> Post Comment </button>
+        </div>
+    </form>
+
+
+
+6. buka ComentController.php dan buat method baru seperti ini : 
+    public function store(Idea $idea){
+        $coment = new Coment ;
+        $coment->idea_id = $idea->id ;
+        $coment->coment = request('coment') ;
+        $coment->save() ;
+
+        return redirect('/')->with('success', 'Coment Succesfully create!') ;
+
+    }
+
+
+7. maka data telah masuk ke database tapi belum muncul di website 
+
+
+==================================================================================
+
+cara melakukan relationship agar coment tertentu hanya ada dipostingan tertentu juga serta menampilkan coment
+
+1. buka file Idea.php dan buat relationship nya seperti ini :
+
+public function coments(){
+        return $this->hasMany(Coment::class) ;
+}
+
+
+
+2. buka file coments.blade.php dan lakukan looping untuk menampilkan semua coment nya seperti ini full codenya :
+{{-- menampilkan semua coment --}}
+    @foreach ($idea->coments->sortByDesc('created_at') as $coment)
+        <div class="d-flex align-items-start">
+            <img style="width:35px" class="me-2 avatar-sm rounded-circle"
+                src="https://api.dicebear.com/6.x/fun-emoji/svg?seed=Luigi"
+                alt="Luigi Avatar">
+            <div class="w-100">
+                <div class="d-flex justify-content-between">
+                    <h6 class="">Luigi
+                    </h6>
+                    <small class="fs-6 fw-light text-muted">  {{ $coment->created_at->diffForHumans() }} </small>
+                </div>
+                <p class="fs-6 mt-3 fw-light">
+                    {{ $coment->coment }}
+                </p>
+            </div>
+        </div>
+    @endforeach
+    {{-- akhir menampilkan semua coment  --}}
+
+
+
+

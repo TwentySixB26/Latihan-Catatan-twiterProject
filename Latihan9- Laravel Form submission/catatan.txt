@@ -1,0 +1,142 @@
+memperbaiki layout tidak sesuai pada sebelumnya
+
+1. Buat view shared/submitIdea.blade.php
+
+
+
+2. buka file dashboard.blade.php dan pindahkan salah code nya kedalam file submitIdea.blade.php yaitu code seperti berikut :
+<h4> Share yours ideas </h4>
+<div class="row">
+        <div class="mb-3">
+            <textarea class="form-control" id="idea" rows="3"></textarea>
+        </div>
+        <div class="">
+            <button class="btn btn-dark"> Share </button>
+        </div>
+</div>
+
+
+
+3. buka file dashboard.blade.php tambahkan include seperti ini :
+@include('shared/submitIdea')
+
+
+
+4. buat file errorMessage.blade.php dan successMessage.blade.php dan buka file nya isikan dengan code ini yang diambil dari dashboard.blade.php dan akan dipanggil ketika keadaan tertentu misalnya data berhasil dibuat tidak:
+
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    Idea created Successfully
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+
+
+5. buat file baru lagi dengan nama ideaCard.blade.php 
+
+
+
+6. buka file dashboard.blade.php kembali dan cut codenya pindahkan ke dalam file ideaCard yaitu seperti ini :
+<div class="card">
+    <div class="px-3 pt-4 pb-2">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <img style="width:50px" class="me-2 avatar-sm rounded-circle"
+                    src="https://api.dicebear.com/6.x/fun-emoji/svg?seed=Mario" alt="Mario Avatar">
+                <div>
+                    <h5 class="card-title mb-0"><a href="#"> Mario
+                        </a></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="card-body">
+            <p class="fs-6 fw-light text-muted">
+                {{-- data diambil dari data base yaitu tabel ideas karena yang dikirim dari controller adalah Models tersbut  --}}
+                {{ $idea->content }}
+            </p>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <a href="#" class="fw-light nav-link fs-6">
+                        <span class="fas fa-heart me-1"> </span>
+                        {{ $idea->likes }}
+                    </a>
+                </div>
+                <div>
+                    <span class="fs-6 fw-light text-muted"> <span class="fas fa-clock"> </span> {{ $idea->created_at  }}</span>
+                </div>
+            </div>
+            <div>
+                <div class="mb-3">
+                    <textarea class="fs-6 form-control" rows="1"></textarea>
+                </div>
+                <div>
+                    <button class="btn btn-primary btn-sm"> Post Comment </button>
+                </div>
+
+                <hr>
+                <div class="d-flex align-items-start">
+                    <img style="width:35px" class="me-2 avatar-sm rounded-circle"
+                        src="https://api.dicebear.com/6.x/fun-emoji/svg?seed=Luigi"
+                        alt="Luigi Avatar">
+                    <div class="w-100">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="">Luigi
+                            </h6>
+                            <small class="fs-6 fw-light text-muted"> 3 hour
+                                ago</small>
+                        </div>
+                        <p class="fs-6 mt-3 fw-light">
+                            and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and
+                            Evil)
+                            by
+                            Cicero, written in 45 BC. This book is a treatise on the theory of ethics,
+                            very
+                            popular during the Renaissan
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+
+
+
+7. perbaiki dashboard.blade.php agar dapat terhubung dengan ideaCard.blade.php karena codingan sebelumnya ada disistu seperti ini contohnya :
+@include('shared/ideaCard')
+
+
+
+======================================================================================================
+
+
+Cara mengirim isi input yang telah diketik ke dalam tabel/database 
+
+
+1. buka file submitIdea.blade.php dan buatlah tag form disitu 
+
+
+2. buat route baru untuk menangani ketika ingin dikirim ke db, buka web.php :
+Route::post('/idea', [IdeaController::class , 'store'])->name('idea.create');
+
+
+3. buat controller baru dengan nama IdeaController 
+
+
+
+4. buka file IdeaController.php dan buat method store dan inilah contoh code nya :
+public function store() {
+        $idea =  Idea::create([
+            'content' => request()->get('idea')
+        ]) ;
+
+        return redirect('/') ;
+}
+
+
+
+
+
+
+
+

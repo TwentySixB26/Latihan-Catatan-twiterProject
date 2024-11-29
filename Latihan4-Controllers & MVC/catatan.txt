@@ -1,0 +1,46 @@
+Cara membuat controller :
+1. buka terminal dan ketikan :
+php artisan make:controller DashboardController 
+
+
+2. maka file nya akan otomatis dibuatkan di dalam folder app/Http/Controller
+
+
+==========================================================================================
+
+
+penerapan controller 
+
+1. buka DashboardController.php dan masukan code berikut atau buat method index: 
+public function index(){
+        return view('welcome') ;
+    }
+
+
+
+2. buka web.php dan perbaiki route nya menjadi :
+Route::get('/', [DashboardController::class , 'index']);
+
+
+
+3. buat controller profile :
+php artisan make:controller ProfileController 
+
+
+4. buka file ProfileController.php dan berikan code : 
+public function index(){
+        return view('welcome') ;
+    }
+
+
+
+
+5. buka web.php untuk menangani routenya dan berikan code ini: 
+Route::get('/profile', [ProfileController::class , 'index']);
+
+
+
+6. buat file profile.blade.php dan berikan code :
+<h1> Profile </h1>
+
+

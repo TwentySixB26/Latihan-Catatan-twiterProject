@@ -1,0 +1,25 @@
+validasi data,digunakan untuk menangani hal hal yang apa saja yang boleh dilakukan di form input, misalnya ketika mengisi input dilarang kosong,atau batasnya hanya boleh 240 karakter 
+
+1. buka IdeaCobtroller dan tambahkan code ini : 
+request()->validate([
+            'idea' => 'required|max:240'
+]) ;
+
+
+
+
+=================================================================================================
+
+membuat pesan kesalahan / error ketika data gagal dimasukan 
+
+1. buka file submitidea.blade.php dan tambahkan code :
+@error('idea')
+    <span class="fs-6 text-danger"> {{ $message }} </span>
+@enderror
+
+
+
+
+
+
+

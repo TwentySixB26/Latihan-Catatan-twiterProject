@@ -1,0 +1,58 @@
+1. buat controler baru seperti ini : 
+php artisan make:controller AuthController 
+
+
+2. buatlah route untuk register seperti ini untuk menampilkan halaman register nya  :
+Route::get('/register', [AuthController::class , 'register']) ;
+
+
+
+3. buat router lagi untuk menangani logic yang akan dilakukan diresgister
+Route::post('/register', [AuthController::class , 'store']) ;
+
+
+4. buka file AuthController.php dan buat method baru dengan nama register seperti ini :
+public function register() {
+    return view('auth/register') ;
+}
+
+
+5. buka folder views dan buat file dengan nama auth/register.blade.php dan buat tampilanya, jangan lupa tambahkan @csrf untuk menjaga codingan anda dan juga action nya 
+
+
+
+6. buat method store untuk menangani logic di register seperti ini : 
+public function store() {
+    //melakukan validasi
+    $validated = request()->validate(
+        [
+            'name' => 'required|min:3|max:40' ,
+            'email' => 'required|email|unique:users,email' ,
+            'password' => 'required|min:8|confirmed'
+        ]
+    ) ;
+    //jika lolos validasi maka password akan di enkripsi
+    $validated['password'] = Hash::make($validated["password"]) ;
+
+    //create user
+    User::create(
+        [
+            'name' => $validated["name"] ,
+            'email' => $validated["email"] ,
+            'password' => $validated["password"] ,
+        ]
+    ) ;
+
+    //redirect
+    return redirect('/')->with('succes', 'Acount sukses dibuat ') ;
+}
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,11 @@
+Cara install laravel : 
+
+1. buka terminal dan ketikan :
+composer create-project laravel/laravel:^10.0 example-app
+
+
+2. untuk membuka projectnya di web maka dapat mengunakan:
+php artisan serve
+
+
+

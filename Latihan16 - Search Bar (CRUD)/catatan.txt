@@ -1,0 +1,158 @@
+memperbaiki layout
+
+1. buat view baru dengan nama shared/searchBar.blade.php
+
+
+2. buka file dashboard.blade.php dan cut code ini pindahkan ke dalam file searchBar.blade.php untuk codenya seperti ini :
+
+<div class="card">
+    <div class="card-header pb-0 border-0">
+        <h5 class="">Search</h5>
+    </div>
+    <div class="card-body">
+        <input placeholder="...
+        " class="form-control w-100" type="text"
+            id="search">
+        <button class="btn btn-dark mt-2"> Search</button>
+    </div>
+</div>
+
+
+
+3. buat view baru kembali dengan nama shared/followBox.blade.php 
+
+
+
+
+4. buka kembali dashboard.blade.php dan cut code ini kedalam file followBox.blade.php seperti ini codenya : 
+
+<div class="card mt-3">
+    <div class="card-header pb-0 border-0">
+        <h5 class="">Who to follow</h5>
+    </div>
+    <div class="card-body">
+        <div class="hstack gap-2 mb-3">
+            <div class="avatar">
+                <a href="#!"><img class="avatar-img rounded-circle"
+                        src="https://api.dicebear.com/6.x/fun-emoji/svg?seed=Mario" alt=""></a>
+            </div>
+            <div class="overflow-hidden">
+                <a class="h6 mb-0" href="#!">Mario Brother</a>
+                <p class="mb-0 small text-truncate">@Mario</p>
+            </div>
+            <a class="btn btn-primary-soft rounded-circle icon-md ms-auto" href="#"><i
+                    class="fa-solid fa-plus"> </i></a>
+        </div>
+        <div class="hstack gap-2 mb-3">
+            <div class="avatar">
+                <a href="#!"><img class="avatar-img rounded-circle"
+                        src="https://api.dicebear.com/6.x/fun-emoji/svg?seed=Mario" alt=""></a>
+            </div>
+            <div class="overflow-hidden">
+                <a class="h6 mb-0" href="#!">Mario Brother</a>
+                <p class="mb-0 small text-truncate">@Mario</p>
+            </div>
+            <a class="btn btn-primary-soft rounded-circle icon-md ms-auto" href="#"><i
+                    class="fa-solid fa-plus"> </i></a>
+        </div>
+        <div class="d-grid mt-3">
+            <a class="btn btn-sm btn-primary-soft" href="#!">Show More</a>
+        </div>
+    </div>
+</div>
+
+
+5. buat view baru dengan nama shared/leftSideBar.blade.php
+
+
+
+6. buka kembali dashboard.blade.php dan cut code ini ke dalam file leftSideBar.blade.php seperti ini codenya :
+<div class="card overflow-hidden">
+    <div class="card-body pt-3">
+        <ul class="nav nav-link-secondary flex-column fw-bold gap-2">
+            <li class="nav-item">
+                <a class="nav-link text-dark" href="#">
+                    <span>Home</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span>Explore</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span>Feed</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span>Terms</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span>Support</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span>Settings</span></a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-footer text-center py-2">
+        <a class="btn btn-link btn-sm" href="#">View Profile </a>
+    </div>
+</div>
+
+
+
+7. buka file dashboard.blade.php dan include kan kedapa dua file tadi seperti ini :
+@include('shared/searchBar')
+@include('shared/followBox')
+@include('shared/leftSideBar')
+
+
+8. buka view ideas/show dan hapus bagian search dan followBox nya diganti dengan code :
+@include('shared/searchBar')
+@include('shared/followBox')
+@include('shared/leftSideBar')
+
+
+==========================================================================================
+
+membuat search bar 
+
+
+1. buka file searchBar.blade.php dan buat form seperti ini : 
+
+<form action="" method="get">
+            <input placeholder="..." class="form-control w-100" type="text" name="search" id="search">
+            <button class="btn btn-dark mt-2"> Search</button>
+</form>
+
+
+
+2. buka file dashboardController dan masuk ke method index serta berikan code ini :
+public function index(){
+
+        // $idea = new Idea([
+        //     'content' => 'test2',
+        // ]) ;
+        // $idea->save() ;
+
+        //mengambil data di database
+        $ideas = Idea::orderBy('created_at' , 'DESC') ;
+
+        //jika ada data yang dikirim lewat form melalui input serach maka akan menimpa variabel $ideas
+        if (request('search')) {
+            $ideas = $ideas->where('content', 'like' , '%' . request('search') . '%')  ;
+        }
+
+        //mengembalikan data 
+        return view('dashboard',[
+            'ideas' => $ideas->paginate(5),
+            //paginate() digunakan untuk berapa data yang ingin ditampilkan per page
+        ]) ;
+    }
+
+
+
+
+

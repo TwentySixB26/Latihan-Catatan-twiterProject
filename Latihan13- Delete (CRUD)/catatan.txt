@@ -1,0 +1,35 @@
+membuat button delete dihalaman postingan 
+
+1. buka file ideaCard dan buat button X untuk menghapus seperti ini :
+<div>
+    <form action="/idea/{{$idea['id']  }}" method="post">
+        @method('delete')
+        @csrf
+        <button class="btn btn-danger btn-sm" type="submit">X</button>
+    </form>
+</div>
+
+
+2. buka web.php untuk membuat route nya seperti ini : 
+Route::delete('/idea/{idea}', [IdeaController::class , 'destroy']);
+
+
+
+3. buka file IdeaController.php dan  buat method baru yang bernama destroy dan berikan isi code nya seperti ini: 
+public function destroy(string $id){
+        //mengambil data melalui models idea
+        //firstOrfail digunakan untuk ketika kita mempunyai dua halaman dan ada dua data yg sama yaitu a dan ketika mengakses halaman 2 data a dihapus maka yang akan terjadi dihalaman 1 ketika data a akan dihapus akan terjadi page not foud atau 404 karena data a sudah dihapus di halaman 2, jika mengunakan fist() maka akan terjadi eror buka not found dan itu akan sangat merepotkan
+        $idea = Idea::where('id' , $id)->firstOrFail() ;
+
+        //menghapus data
+        $idea->delete() ;
+
+        //redirect ke halaman utama
+        return redirect('/')->with('success', 'Post succesfuly deleted') ;
+    }
+
+
+
+
+
+

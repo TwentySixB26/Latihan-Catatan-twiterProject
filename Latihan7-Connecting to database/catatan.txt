@@ -1,0 +1,16 @@
+cara agar file latavel terhubung ke database :
+
+1. buka file .env dan buka bagian database,ubah code agar menjadi :
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=twitter
+DB_USERNAME=root
+DB_PASSWORD=
+
+
+2. buat database nya dengan table plus 
+
+
+3. kirim scema di laravel ke database dengan cara:
+php artisan migrate 

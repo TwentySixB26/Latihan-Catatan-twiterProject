@@ -1,0 +1,46 @@
+routing grup digunakan untuk mengelompokan routing agar tidak terjadi banyaknya routing caranya adalah :
+
+
+1. buka file web.php yang digunakan untuk menangani route dan ubah codenya menjadi seperti berikut :
+
+Route::group(['prefix' => 'ideas/' , 'as' => 'ideas.'] , function() {
+    Route::post('', [IdeaController::class , 'store'])->name('idea.create');
+    Route::get('/{idea}', [IdeaController::class , 'show']);
+    Route::group(['middleware' => ['auth']],function(){
+        Route::delete('/{idea}', [IdeaController::class , 'destroy'])->middleware('auth');
+        Route::get('/{idea}/edit', [IdeaController::class , 'edit'])->middleware('auth');
+        Route::put('/{idea}', [IdeaController::class , 'update'])->middleware('auth');
+        Route::post('/{idea}/coments', [ComentController::class , 'store'])->middleware('auth');
+    }) ;
+}) ;
+
+
+
+
+2. buat file baru di folder routes dengan nama auth.php 
+
+
+
+3. buka file web.php dan copy yang bagian auth (login,register dan log out),pindahkan ke file auth.php :
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+
+Route::get('/register', [AuthController::class , 'register']) ;   //tampilan register
+Route::post('/register', [AuthController::class , 'store']) ;      // logic register
+
+Route::get('/login', [AuthController::class , 'login'])->name('login') ;           //tampilan login
+Route::post('/login', [AuthController::class , 'authenticate']) ;   //logic login
+
+Route::post('/logout', [AuthController::class , 'logout']) ;
+
+
+
+4. tapi akan terjadi eror untuk bagian auth,karena perlu mendaftarkanya terlebih dahulu dengan cara file providers/RouteServicesProvider.php dan tambahkan code ini :
+Route::middleware('web')
+    ->group(base_path('routes/auth.php'));
+
+
+
+

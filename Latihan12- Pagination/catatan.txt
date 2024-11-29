@@ -1,0 +1,36 @@
+Pagination digunakan untuk membuat bagian dari beberapa halaman 
+
+cara membuat paginate dan data dibatasi hanya beberapa data saja yang ingin ditampilkan 
+
+1. buka file dashboardController dan tambahkan paginate(berapa banyak data yg ingin tampil) contohnya  :
+return view('dashboard',[
+            'ideas' => Idea::orderBy('created_at' , 'DESC')->paginate(5)
+]) ;
+
+
+
+==================================================================================
+
+cara memunculkan dan berpindah halaman dari satu page ke page lain 
+
+1. buka file dashboard.blade.php dan tambahkan code ini :
+{{ $ideas->links() }}
+
+
+2. tapi akan terjadi error karena defaultnya mengunakan tailwind sedangkan pada project ini mengunakan bootsrap oleh sebab itu untuk membenarkanya adalah buka file providers/AppServiceProvider.php dan tambahkan code ini pada method boot :
+
+use Illuminate\Pagination\Paginator;
+
+
+public function boot(): void
+    {
+        paginator::useBootstrapFive();
+}
+
+
+
+
+
+
+
+

@@ -1,0 +1,177 @@
+memperbaiki agar postingan tidak dapat dibuat atau dihapus oleh sembarang orang, dan hanya akan diedit atau dihapus oleh si pembuat 
+
+1. buka migrations ideas dan ubah menjadi seperti ini:
+ Schema::create('ideas', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete() ;
+            $table->string('content') ;
+            $table->unsignedBigInteger('likes')->default(0) ;
+            $table->timestamps();
+        });
+
+
+
+2. buka file migrations untuk comments dan perbaiki juga schema nya agar menjadi seperti berikut :
+Schema::create('coments', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->cascadeOnDelete() ;
+    $table->foreignId('idea_id')->constrained()->cascadeOnDelete() ;
+    $table->string('coment') ;
+    $table->timestamps();
+});
+
+
+
+
+3. buka terminal dan lakukan php artisan migrate kembali :
+php artisan migrate:refresh
+
+
+
+
+4. buka file ideaController.php dan masuk ke method store lalu ubah codenya seperti ini : 
+public function store() {
+        //melakukan validasi data
+        $validated = request()->validate([
+            'content' => 'required|max:240'
+        ]) ;
+
+        //user_id akan diambil ketika anda sudah login dan akan diisi sesuai dengan yg sedang login
+        $validated["user_id"] = auth()->id();
+
+
+
+        //memasukan data ke db
+        Idea::create($validated) ;
+
+        //melakukan redirect ketika code sebelumnya dieksekusi entah sukses atau gagal
+        return redirect('/')->with('success', 'Post succesfuly create') ;
+}
+
+
+
+
+5. buka file comentsController.php dan masuk ke method store juga perbaiki seperti ini codenya :
+    public function store(Idea $idea){
+
+        //mendifiniskan table yang ada ditabase
+        $coment = new Coment() ;
+
+        //memasukan id yang coment pada variabel coment
+        $coment->idea_id = $idea->id ;
+
+        //user id pada tabel yg ada di db diambil dari id user yg sudah login
+        $coment->user_id = auth()->id() ;
+
+        //memasukan isi coment ke dalam variabel coment yang diambil dari request yang telah diisi pada textarea
+        $coment->coment = request('coment') ;
+
+        //melakukan save atau mengirim data ke database
+        $coment->save() ;
+
+        return redirect('/')->with('success', 'Coment Succesfully create!') ;
+    }
+
+
+
+
+
+
+6. buka file submitIdea.blade.php dan berikan @auth() agar code akan tampil ketika sudah login maka hasilnya seperti ini codenya : 
+@auth
+<h4> Share yours ideas </h4>
+<div class="row">
+    <form action="/idea" method="post">
+        @csrf
+        <div class="mb-3">
+            <textarea class="form-control" id="content" rows="3" name="content"></textarea>
+            @error('idea')
+                <span class="fs-6 text-danger"> {{ $message }} </span>
+            @enderror
+        </div>
+        <div class="">
+            <button class="btn btn-dark" type="submit"> Share </button>
+        </div>
+    </form>
+</div>
+@endauth
+
+
+
+@guest()
+    <h4> Anda belum melakukan Login</h4>
+@endguest
+
+
+
+7. buka file Idea.php dan buat method baru untuk menghubungkan antara idea dengan user :
+    public function user(){
+        return $this->belongsTo(User::class) ;
+    }
+
+
+
+8. buka file User.php dan buat method baru untuk menghubungkan antara user dengan idea :
+public function ideas(){
+    return $this->hasMany(Idea::class) ;
+}
+
+
+
+9. buka comment.php dan buat method baru untuk menghubungkan antara coment dengan user :
+
+public function user(){
+    return $this->belongsTo(User::class) ;
+}
+
+
+
+10. buka file ideaCard.blade.php dan perbaiki codenya agar nama yang tampil dan img nya tidak default tapi tergantung pada apa yg diperoleh dari db :
+
+<div class="d-flex align-items-center">
+    <img style="width:50px" class="me-2 avatar-sm rounded-circle"
+        src="https://api.dicebear.com/6.x/fun-emoji/svg?seed={{ $idea->user->name }}" alt="Mario Avatar">
+    <div>
+        <h5 class="card-title mb-0"><a href="#"> {{ $idea->user->name }}
+            </a></h5>
+    </div>
+</div>
+
+
+
+=========================================================================================================
+
+mengatasi agar yang dapat mengedit atau delete hanya user tertentu
+
+1. buka route dan edit menjadi seperti ini atau tambahkan middleware('auth') :
+
+Route::delete('/idea/{idea}', [IdeaController::class , 'destroy'])->middleware('auth');
+Route::get('/idea/{idea}/edit', [IdeaController::class , 'edit'])->middleware('auth');
+Route::put('/idea/{idea}', [IdeaController::class , 'update'])->middleware('auth');
+Route::post('/idea/{idea}/coments', [ComentController::class , 'store'])->middleware('auth');
+
+
+==============================================================================================
+
+mengatasi problem ketika sudah login maka yang bisa diedit hanyalah postingan kita,kita tidak bisa mengedit postingan orang lain caranya adalah 
+
+
+1. buka file ideaController.php dan buka method destroy,update,edit tambahkan code ini :
+        
+//jika user yang login tidak sesuai dengan postingan yg berleasi dengan idea maka tidak bisa melakukan destroy,edit,update
+if (auth()->id() !== $idea->user_id) {
+    abort(404) ;
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+

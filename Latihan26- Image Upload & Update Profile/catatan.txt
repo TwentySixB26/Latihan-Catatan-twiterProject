@@ -1,0 +1,300 @@
+1. buka web.php dan buat route baru :
+Route::get('/profile', [UserController::class , 'profile'])->middleware('auth');
+
+
+
+2. buka file nav.balde.php dan buat link untuk mengarahkan ke dalam route yang sudah dibuat pada no 1 seperti ini :
+<li class="nav-item">
+    <a class="nav-link" href="/profile">{{ Auth::user()->name }}</a>
+    {{-- Auth::user()->name  digunakan untuk mengambil nama yang sedang login --}}
+</li>
+
+
+
+3. buka file UserController.php dan buat method baru yaitu profile 
+public function profile(){
+        return $this->show(auth()->user()) ;
+}
+
+ini tampilanya atau fungsi mirip dengan '/users/2' 2 melambangkan idk
+
+
+
+4. buka file idea-card.blade.php dan perbaiki salah satu codenya agar menjadi seperti ini,ini berfungsi ketika profile diklik maka akan menuju profil mereka :
+
+<div>
+    <h5 class="card-title mb-0">
+        <a href="users/{{ $idea->user->id  }}"> {{ $idea->user->name }}</a>
+    </h5>
+</div>
+
+
+
+==============================================================================================
+
+memperbaiki database agar image dan bio dapat disimpan di database
+
+1. buka terminal dan ketikan :
+php artisan make:migration add_bio_and_image_to_users 
+
+
+
+2. buka file ...add_bio_and_image_to_users dan perbaiki scema nya,scema harus masuk ke dalam db user seperti ini :
+Schema::table('users', function (Blueprint $table) {
+    
+});
+
+karena bio dan img masuk ke dalam db user 
+
+
+
+3. perbaiki bagian up() dan down() menjadi seperti ini :
+
+public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('image')->nullable() ;
+            $table->string('bio')->nullable() ;
+        });
+    }
+
+
+public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('image') ;
+            $table->dropColumn('bio') ;
+        });
+    }
+
+
+
+
+
+4. kirim schema yg telah dibuat ke dalam db dengan cara buka terminal dan ketikan :
+php artisan migrate 
+
+
+
+5. buka file user-card.blade.php  dan perbaiki inputnya agar memberikan name='' agar bisa dikirim ke db dan juga menangani eror yaitu @eror  : 
+
+<input name="name" value="{{ $user->name }}" type="text" class="form-control">
+@error('name')
+    <span class="text-danger fs-6">{{ $message }}</span>
+@enderror
+
+
+
+
+6. masih di file user-card.blade.php, tambahkan code ini ketika masuk ke mode edit untuk mengani input file agar dapat mengungah photo: 
+
+{{--input untuk menangani image --}}
+@if ($editing ?? false)
+    <div class="mt-4">
+        <label for="">Profile Picture</label>
+        <input type="file" class="form-control" name="image">
+    </div>
+@endif
+@error('image')
+    <span class="fs-6 text-danger"> {{ $message }} </span>
+@enderror
+{{-- akhir input untuk menangani image --}}
+
+
+
+7. buat file shared/user-edit-card.blade.php agar file user-card.blade.php tidak terlihat jelek codingan nya,user-card akan digunakan untuk view saja dan edit akan ditempatkan di user-edit-card.blade.php 
+
+
+
+8. copy kan semua file yg ada di user-card.blade.php ke dalam user-edit-card.blade.php 
+
+
+
+9. buka file user-card.blade.php, hapus semua code yang menunjukan mode edit seperti ini(yang ada $editing ??false) :
+
+@if ($editing ?? false)
+    <div class="mb-3">
+                    <textarea class="form-control" id="bio" rows="3" name="bio"></textarea>
+                    @error('bio')
+                        <span class="fs-6 text-danger"> {{ $message }} </span>
+                    @enderror
+    </div>
+    <button class="btn btn-dark btn-sm">Save</button>
+@else
+    //bagian ini jangan di hapus
+@endif
+
+
+
+
+
+10. buka user-edit-card.blade.php  hapus yang tidak berhubungan dengan edit, atau kebalikan dari nomer 9 
+
+
+
+11. buka foldew view/users dan buat file baru dengan nama edit.blade.php 
+
+
+12. buka file users/show.blade.php dan copy kan ke dalam file edit.blade.php 
+
+
+13. buka edit.blade.php dan perbaiki bagian include @include('shared.user-card') menjadi @include('shared.user-edit-card') 
+
+
+
+14. buka file UserController.php perbaiki method edit untuk view nya yang awalnya users.show menjadi users.edit seperti ini :
+public function edit(User $user)
+    {
+        $editing = true ;
+        $ideas = $user->ideas()->paginate(5) ;
+        return view('users.edit',compact('user','editing','ideas')) ;
+    }
+
+
+
+=======================================================================================================
+
+jika masuk ke fitur edit maka text edit akan diganti menjadi view caranya adalah :
+
+1. buka file user-edit-card.blade.php ganti code sebelumnya menjadi ini :
+@auth()
+    @if (Auth::id() === $user->id)
+        <a href="/users/{{ $user->id }}/show"> view </a>
+    @endif
+@endauth
+
+
+==========================================================================================================
+memasukan data yg dikirim lewat form ke db 
+
+1. pada file user-edit-card.blade.php {{-- img profile, nama , view --}} , {{--input untuk menangani image --}} , 
+{{-- bio,btn save,followers,coment --}} simpan didalam tag form :
+
+<form enctype="multipart/form-data" method="post" action="/users/{{ $user->id }}">
+    @csrf
+    @method('put')
+    {{-- img profile, nama , view --}}
+
+    {{--input untuk menangani image --}}
+    
+    {{-- bio,btn save,followers,coment --}}
+</form>
+
+
+
+2. buka file UserController.php dan perbaiki method update : 
+
+public function update(User $user)
+    {
+        $validated = request()->validate([
+            'name' => 'required|min:3|max:40' ,
+            'bio' => 'nullable|min:1|max:255',
+            'image' => 'image' 
+        ]) ; 
+
+        $user->update($validated) ; 
+        return redirect('/profile') ; 
+    }
+
+
+
+3. buka file User.php dan tambahkan bagian fillible nya yaitu bio dan image seperti ini :
+
+protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'bio',
+        'image',
+    ];
+
+
+
+
+4. buka file user-edit-card.blade.php untuk memperbaiki bio seperti ini, hal tersebut digunakan untuk ketika mengklik edit akan ada bio nya dari db :
+<textarea class="form-control" id="bio" rows="3" name="bio"> {{ $user->bio }} </textarea>
+
+
+
+5. buka file user-card.blade.php dan perbaiki code sebelumnya menjadi,ini berfungsi untuk menampilkan data yang ada di database yaitu bio  :
+<p class="fs-6 fw-light">
+    {{ $user->bio }}
+</p>
+
+
+
+==========================================================================================================
+
+menangani bagian input file/gambar 
+
+1. buka file UserController.php dan tambahkan code ini untuk menangani upload gambar didalam method update:
+
+if (request()->has('image')) {
+    $imagePath = request()->file('image')->store('profile','public') ;
+    $validated['image'] = $imagePath ;
+} ;
+
+
+request()->has('image'): Mengecek apakah ada input bernama 'image' dalam request. Jika ada (meskipun kosong), kondisi ini akan true. 
+
+request()->file('image'): Mengambil file yang diunggah melalui input bernama 'image'.
+
+Fungsi file('image') mengembalikan objek UploadedFile, yang menyediakan berbagai metode untuk bekerja dengan file yang diunggah.
+
+store('profile', 'public'): 
+store: Menyimpan file yang diunggah ke penyimpanan (storage) Laravel.
+'profile': Menentukan direktori tempat file akan disimpan. Dalam hal ini, file akan disimpan di dalam folder profile.
+'public': Menentukan disk (storage) tempat penyimpanan file, di mana disk public merujuk pada storage/app/public (direktori ini biasanya disimbolis ke folder public/storage dalam aplikasi Laravel agar file bisa diakses publik).
+
+
+hasil : storage/app/public/profile/avatar.jpg
+
+
+
+2. buka file user-edit-card.blade.php dan perbaiki bagian src nya menjadi seperti itu 
+<img style="width:150px" class="me-3 avatar-sm rounded-circle" src="{{ $user->getImageUrl() }}" alt="Mario Avatar">
+
+
+//src diambil dari file user.php dan method getImageURL() maka akan menjalankan fungsi getImageURL
+
+
+
+3. buka file user.php , untuk menangani gambar default jika user tidak mengirimkan gambar :
+
+public function getImageURL(){
+        if ($this->image) {
+            return url('storage/' . $this->image);
+        }
+        return "https://api.dicebear.com/6.x/fun-emoji/svg?seed={{ $this->name }}" ;
+    }
+
+
+//ketika fungsi getImageURL dijalankan maka akan mengecek ada tidak gambarnya,jika ada maka akan mengunakan gambar sesuai yang ada, jika tidak maka akan ditetapkan defaultnya mengunakan api.dicebear 
+
+
+
+4. lakukan juga pada user-card.blade.php , coment.blade.php, ideaCard.blade.php seperti pada nomer 2 
+
+
+
+5. buka terminal dan ketikan : 
+php artisan storage:link 
+
+
+//jika kita menerima img dari input maka img akan tersimpan di disk local yang bernama storage/app/public/profile/nama file.jpg , hal tersebut tidak bisa diakses untuk ui nya/tampilanya karena agar dapat tampil img harus ada  folder public bukan storage, public nya itu diluar dari storage! 
+
+//oleh sebab itu kita musti melakukan ini agar terhubung dengan public nya 
+
+
+==================================================================================================================
+
+
+jika kita mengubah data nya kembali maka img baru akan tersimpan,jika user sering menganti nya maka disk kita akan penuh untuk mengatasinya cara agar ketika user mengupload img baru maka akan menghapus img yang lama caranya aadalah : 
+
+
+1. buka UserController.php dan tambahkan code ini di method update: 
+Storage::disk('public')->delete($user->image) ;
+
+
+
+

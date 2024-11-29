@@ -1,0 +1,41 @@
+1. App 
+berisikan tentang hal hal untuk menangani berbagai website seperti contohnya :
+a. Http/Controller 
+berisikan file yang digunakan untuk mengelola controller apa yang hendak dilakukan jika route itu berhasil ditangani oleh file route 
+
+b. Models 
+digunakan untuk menangani semua logic yang akan digunakan untuk mengambil data didalam db atau pun yang lainya 
+
+
+
+
+2. config 
+berisikan konfigurasi 
+
+
+
+
+3. Database 
+folder yang menangani semua yang hendak dilakukan atau berhubungan dengan database :
+a. factories 
+digunakan untuk membuat data dummy atau faker 
+
+b. migrations 
+digunakan untuk mengelola skema yang ingin ada didalam database,seperti contohnya ketika membuat tabel buku maka di tabel tersebut berisikan judul,pengarang dan tahun terbit
+
+c. seeder 
+digunakan untuk membuat data dummy secara manual/memasukan data ke dalam tabel 
+
+
+
+
+4. resources
+digunakan untuk mengelola file seperti js,html dan css yang akan digunakan didalam web atau user dapat melihatnya 
+
+
+
+
+
+5. routes 
+menangani masalah route, atau ketika link diakses akan mengarahkan kemana 
+

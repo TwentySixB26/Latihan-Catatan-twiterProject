@@ -1,0 +1,84 @@
+
+1. buka file dashboard.blade.php dan berikan code , codenya ada di link ini :
+https://github.com/yelocode/bootstrap5-twitter-clone-template/blob/main/index.html
+
+
+2. buka file route nya dan ubah menjadi seperti ini :
+Route::get('/', [DashboardController::class , 'index']);
+
+
+code yang menuju get nya('/') pada sebelumnya komentari saja 
+
+
+3. buat route baru yang mengarah ke terms :
+Route::get('/terms', function () {
+    return view('terms') ;
+});
+
+
+
+4. buat file terms.blade.php 
+
+
+
+5. buka file terms.blade.php, hapus isi dari beberapa menu dan hanya menyisahkan navbar, serta buat H1 dan div baru, div baru tersebut berisikan lorem sederhana seperti ini contohnya 
+
+////tag navbar 
+<div class="container py-4">
+    <h1>Terms</h1>
+    <div>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio, sed deserunt, veniam velit suscipit molestias recusandae non facilis nesciunt fugiat illum minus iste dolorem commodi ratione vitae officia sequi iusto incidunt autem rerum impedit, quia soluta vel? Blanditiis molestiae optio impedit facere praesentium excepturi suscipit obcaecati mollitia nemo accusamus tempora, assumenda quas corporis harum. Tenetur, a accusamus. Similique, modi. Eius laborum iure veniam impedit laudantium, totam delectus quos optio iste inventore fuga deserunt in aliquam molestiae debitis vero ipsum aliquid ratione mollitia, doloremque ullam? Doloremque, aliquam. Et aliquid, magni non laborum libero facilis vel explicabo enim? Voluptas facere voluptatibus eligendi ab dolor neque, rerum ducimus deleniti non nesciunt officiis nostrum deserunt quam ea molestias asperiores quod et cum reiciendis. Dolorem.
+    </div>
+</div>
+////akhir tag navbar 
+
+
+
+===============================================================================================
+
+
+membuat layout 
+fungsinya adalah untuk memecah beberapa bagian,contohnya ketika anda membuat navbar dan navbar ingin ada disetiap page maka harus menuliskan semua navbar disetiap file dan itu akan merepotkan ketika navbar ingin di edit karena diharuskan mengedit semua file,dengan membuat layout anda hanya perlu mengedit satu file saja maka file yang lain akan mengikutinya. 
+
+
+1. buat file layout/layout.blade.php
+
+
+2. cut semua code yang ada di terms.blade.php dan pindahkan ke layout.blade.php kecuali h1 dan div yang berisikan lorem 
+
+
+
+3. buka file layout.blade.php dan tambahkan code ini setelah navbar,ini berfungsi untuk memberi tau bahwa file ini terhubung dengan terms.blade.php / code ini diambil dari terms.blade.php seperti ini contohnya :
+
+@yield('content')
+
+
+4. buka file terms.blade.php dan berikan code ini :
+@extends('layout/layout')
+
+@section('content')
+    <h1>Terms</h1>
+    <div>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio, sed deserunt, veniam velit suscipit molestias recusandae non facilis nesciunt fugiat illum minus iste dolorem commodi ratione vitae officia sequi iusto incidunt autem rerum impedit, quia soluta vel? Blanditiis molestiae optio impedit facere praesentium excepturi suscipit obcaecati mollitia nemo accusamus tempora, assumenda quas corporis harum. Tenetur, a accusamus. Similique, modi. Eius laborum iure veniam impedit laudantium, totam delectus quos optio iste inventore fuga deserunt in aliquam molestiae debitis vero ipsum aliquid ratione mollitia, doloremque ullam? Doloremque, aliquam. Et aliquid, magni non laborum libero facilis vel explicabo enim? Voluptas facere voluptatibus eligendi ab dolor neque, rerum ducimus deleniti non nesciunt officiis nostrum deserunt quam ea molestias asperiores quod et cum reiciendis. Dolorem.
+    </div>
+@endsection
+
+
+
+
+5. perbaiki juga untuk halaman dashboard seperti terms
+
+
+
+6. buat file layout/nav.blade.php , untuk menyimpan navbar 
+
+
+7. buka file layout.blade.php dan cut nav ke dalam file nav.blade.php
+
+
+
+8. buka file layout.blade.php dan tambahkan code ini :
+@include('layout/nav')
+
+
+

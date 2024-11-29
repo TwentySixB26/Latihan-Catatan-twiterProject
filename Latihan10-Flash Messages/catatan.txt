@@ -1,0 +1,30 @@
+membuat flash message, flash massage adalah fungsi ketika berhasil melakukan sesuatu maupun error,misalnya ketika membuat register dan ketika data berhasil terdaftar akan muncul alert sukses ,caranya adalah :
+
+
+1. buka file IdeaController.php dan tambahkan code with() seperti ini :
+return redirect('/')->with('success', 'Post succesfuly create') 
+
+
+
+2. buka file success.blade.php dan tambahkan code ini :
+
+@if (session()->has('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+
+
+
+3. buka file dashboard.blade.php dan berikan code ini agar terhubung degan succes.blade.php dan akan menampilkan codenya ketika success :
+
+@include('shared/succes')
+
+
+
+
+
+
+

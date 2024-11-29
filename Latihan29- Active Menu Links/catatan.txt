@@ -1,0 +1,67 @@
+1. buka file leftSideBar.blade.php dan perbaiki bagian tag <a> </a> untuk menangani ketika route nya dashboard maka menu dashboard akan mempunyai background hitam:
+
+<a class="{{ Route::is('dashboard') ? 'text-white bg-primary rounded' : '' }} nav-link " href="{{ route('dashboard') }}">
+
+
+contoh full code :
+
+<li class="nav-item">
+    <a class="{{ Route::is('dashboard') ? 'text-white bg-primary rounded' : '' }} nav-link " href="{{ route('dashboard') }}">
+        <span>Home</span>
+    </a>
+</li>
+<li class="nav-item">
+    <a class="{{ Request::is('terms') ? 'text-white bg-primary rounded' : '' }} nav-link " href="terms">
+        <span>Terms</span>
+    </a>
+</li>
+
+
+
+
+2. perbaki div ini untuk menangani masalah profile , masih di file leftSideBar.blade.php:
+<div class="card-footer text-center py-2">
+        <a class="btn btn-link btn-sm" href="{{ route('profile') }}">View Profile </a>
+</div>
+
+
+
+
+=============================================================================================
+
+active menu untuk bagian login dan register 
+
+
+1. buka file auth.php dan berikan name pada login,register dan logout 
+
+
+
+2. buka file nav.blade.php dan perbaiki tag a nya seperti ini :
+
+<a class="{{ Route::is('login') ? 'active' : '' }} nav-link " aria-current="page" href="/login">Login</a>
+
+
+untuk full code : 
+
+<li class="nav-item">
+    <a class="{{ Route::is('login') ? 'active' : '' }} nav-link " aria-current="page" href="/login">Login</a>
+</li>
+<li class="nav-item">
+    <a class=" {{ Route::is('register') ? 'active' : '' }} nav-link" href="/register">Register</a>
+</li> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

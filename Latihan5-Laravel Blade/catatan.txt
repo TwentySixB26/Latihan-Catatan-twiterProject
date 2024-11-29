@@ -1,0 +1,37 @@
+Cara mengirim data ke dalam tampilan website 
+
+1. buka file dashboardcontroller.php dan tambahkan code ini pada method index() atau ganti code sebelumnya dengan code ini:  
+$users = [
+            [
+                'name' => 'alex' ,
+                'age' => 23
+            ] ,
+            [
+                'name' => 'Joy' ,
+                'age' => 33
+            ]
+        ];
+return view('dashboard',[
+    'users' => $users
+]) ;
+
+
+
+
+2. buka file dashboard.blade.php dan berikan code ini atau ganti code sebelumnya agar dapat memunculkan data yang sudah dibuat sebelumnya :
+@foreach ($users as $user)
+        <h1>{{ $user['name'] }}, Umur : {{ $user['age'] }} tahun</h1>
+
+        @if ($user['age'] < 18)
+            <p> User belum boleh mengemudi </p>
+        @endif
+        <hr>
+@endforeach
+
+
+// @foreach,@if dan {{  }} adalah fungsi yang dimiliki oleh blade 
+
+
+
+
+

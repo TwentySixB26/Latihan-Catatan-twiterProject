@@ -1,0 +1,29 @@
+Route digunakan untuk menangani ketika sesuatu diakases maka akan diarahkan kemana atau apa yang ingin ditampilkan dengan mengembalikan return pada suatu route 
+
+
+contoh membuat route sendiri,membuat route feed dan profile  : 
+1. buka file web.php dan tuliskan :
+
+Route::get('/profile', function () {
+    return view('users/profile');
+});
+
+
+Route::get('/feed', function () {
+    return view('feed');
+});
+
+
+
+
+2. buat view baru dengan nama feed.blade.php untuk mengani ketika route feed di lakukan dan tambahkan code ini didalam file feed.blade.php :
+<h1>Feed</h1>
+
+
+3. buat view baru dengan nama profile.blade.php untuk mengani ketika route feed di lakukan dan tambahkan code ini didalam file profile.blade.php :
+<h1>Profile</h1>
+
+
+
+
+

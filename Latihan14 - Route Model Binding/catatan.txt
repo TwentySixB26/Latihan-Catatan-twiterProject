@@ -1,0 +1,40 @@
+Route Model Binding di Laravel adalah fitur yang memudahkan pengambilan model dari URL secara otomatis. Dengan Route Model Binding, Anda tidak perlu secara manual mencari model berdasarkan ID yang diterima di URL; Laravel akan melakukannya secara otomatis.
+
+1. contohnya pada cara lain ketika hendak menghapus atau drop tabel pada case ini yang ada di ideaController.php :
+public function destroy(Idea $idea)
+    {
+        // Idea::destroy($idea->id) ;
+        $idea->delete() ;
+        return redirect('/')->with('success', 'Post succesfuly deletedddd') ;
+    }
+
+
+======================================================================
+
+membuat show,show itu seperti ketika kita memposting sesuatu dan ingin melihat postingan itu lebih banyak maka akan melakukan show preview untuk melihat keseluruhan isinya caranya adalah :
+
+
+1. buka web.php dan tambahkan route ini : 
+Route::get('/idea/{idea}', [IdeaController::class , 'show']);
+
+
+
+2. buka ideaController.php dan buat method show seperti ini :
+public function show(Idea $idea) {
+        return view('ideas/show',[
+            'idea' => $idea
+        ]) ;
+}
+
+
+
+3. buat view dengan nama ideas/show 
+
+
+4. copy semua isi dari file dashboard.blade.php ke dalam show.blade.php dan ubah beberapa codde nya 
+
+
+5. buka file ideaController.blade.php tambahkan code ini,karena untuk show atau detail postingan, dan ketika diklik maka akan mengarahkan ke link tersebut dan akan ditangani oleh route yg sudah dibuat sebelumnya  :
+<a href="/idea/{{ $idea['id'] }}"> View </a>
+
+

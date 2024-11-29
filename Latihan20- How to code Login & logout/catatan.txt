@@ -1,0 +1,79 @@
+1. buat route untuk menangani tampilan login dan logic nya seperti berikut :
+Route::get('/login', [AuthController::class , 'login']) ;
+Route::post('/login', [AuthController::class , 'authenticate']) ;
+
+
+
+2. buka file AuthController.php dan buat method login seperti ini :
+public function login() {
+    return view('auth/login') ;
+}
+
+
+3. buka views dan buat file nya untuk menampilkan login 'auth/login' beserta buat code html dan tampilanya
+
+
+
+4. buka file AuthController.php dan buat method authenticate seperti ini :
+public function authenticate() {
+        //melakukan validasi ketika input diketik
+        $validated = request()->validate(
+            [
+                'email' => 'required|email' ,
+                'password' => 'required|min:8'
+            ]
+        ) ;
+
+        //melakukan login/mengecek data yang ingin login ada di database atau tidak
+        if (auth()->attempt($validated)) {
+            request()->session()->regenerate() ;    //membuat session agar ketika login sukses maka semua data yang berhubungan  dengan yang login tadi bisa diakses
+            return redirect('/')->with('success', 'akun sukses Login') ;   //redirect
+        }
+
+        //redirect
+        return redirect('/')->withErrors([
+            'email' => 'no machting user found'
+        ]) ;
+}
+
+
+
+5. buka file nav.blade.php kembali untuk mengeditnya, tambahkan @guest jika ingin halaman/menu ini tampil ketika
+belum login dan jika hanya akan tampil ketika sudah login mengunakan @auth()
+
+
+
+
+
+==============================================================================================
+
+
+Membuat log out
+
+
+1. buat route baru seperti ini :
+Route::post('/logout', [AuthController::class , 'logout']) ;
+
+
+2. buka AuthController.php dan buat method logout untuk menangani logout pada penguna :
+public function logout(){
+    auth()->logout() ;                      //melakukan logut
+    request()->session()->invalidate();     //menghapus semua sesion yang ada
+    request()->session()->regenerateToken();    //mengenarate ulang token
+
+    return redirect('/')->with('success', 'logout telah berhasil!') ;
+}
+
+
+
+
+3. buka nav.blade.php kembali dan tambahkan menu logout seperti ini :
+<li class="nav-item">
+    <form action="/logout" method="post">
+        @csrf
+        <button type="submit" class="btn btn-danger btn-sm"> Logout </button>
+    </form>
+</li>
+
+
+

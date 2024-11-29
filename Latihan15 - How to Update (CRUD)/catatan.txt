@@ -1,0 +1,103 @@
+cara  melakukan edit : 
+
+
+1. buka file ideaController.php dan tambahkan codenya menjadi : 
+<a href="/idea/{{ $idea['id'] }}/edit"> Edit </a>
+
+
+2. buka web.php dan tambahkan routenya 
+Route::get('/idea/{idea}/edit', [IdeaController::class , 'edit']);
+
+
+
+3. buka file ideaController.php dan buat method baru seperti ini :
+public function edit(Idea $idea) {
+        $editing = true ;
+        return view('ideas/show',[
+            'idea' => $idea,
+            'editing' => $editing
+        ]) ;
+    }
+
+
+
+4. buka file ideaCard.blade.php dan tambahkan code ini,karena kita tidak membuat view baru untuk mengani edit tettapi mengunakan view yang sudah ada  : 
+
+@if ($editing  ?? false)
+<form action="/idea/{{ $idea['id'] }}" method="post">
+    @csrf
+    <div class="mb-3">
+        <textarea class="form-control" id="content" rows="3" name="content">{{ $idea->content }}</textarea>
+        @error('content')
+            <span class="fs-6 text-danger"> {{ $message }} </span>
+        @enderror
+    </div>
+    <div class="">
+        <button class="btn btn-dark" type="submit"> Share </button>
+    </div>
+</form>
+@else
+<p class="fs-6 fw-light text-muted">
+    {{-- data diambil dari data base yaitu tabel ideas karena yang dikirim dari controller adalah Models tersbut  --}}
+    {{ $idea->content }}
+</p>
+@endif
+
+
+
+
+====================================================================================
+
+cara melakukan update 
+
+1. buka web.php kembali dan buat route nya : 
+Route::put('/idea/{idea}', [IdeaController::class , 'update']);
+
+
+2. buka file ideaCard.blade.php dan tambahkan method put untuk melakukan update :
+@method('put')
+
+
+3. buka file ideaController.php dan tambahkan method baru :
+public function update(Idea $idea) {
+
+        //melakukan validasi data
+        request()->validate([
+            'content' => 'required|max:240'
+        ]) ;
+
+        // data yang telah lolos validasi maka disimpan divariabel
+        $idea->content = request()->get('content') ;
+
+        //melakukan save atau mengirim data ke database
+        $idea->save() ;
+
+        return redirect('/idea' .'/' . $idea->id)->with('success', 'Post succesfuly updated') ;
+    }
+
+
+
+4. buka file submitIdea.blade.php , pergi ke text area dan ubah id beserta name nya menjadi content dari awalnya idea seperti ini contohnya :
+<textarea class="form-control" id="content" rows="3" name="content"></textarea>
+
+
+
+5. buka ideaController.php dan revisi code storenya menjadi seperti ini :
+    public function store() {
+        //melakukan validasi data
+        request()->validate([
+            'content' => 'required|max:240'
+        ]) ;
+
+        //memasukan data ke db
+        $idea =  Idea::create([
+            'content' => request()->get('idea')
+        ]) ;
+
+        //melakukan redirect ketika code sebelumnya dieksekusi entah sukses atau gagal
+        return redirect('/')->with('success', 'Post succesfuly create') ;
+    }
+
+
+
+

@@ -1,0 +1,42 @@
+1. buka file dashboardController.php dan berikan with() pada method index untuk mengunakan eager loading,with() ini digunakan dibagian untuk menampilkan data atau mengambil data dari db dan hanya relationship nya saja seperti ini contoh codenya :
+
+$ideas = Idea::with('user','coments.user')->orderBy('created_at' , 'DESC') ;
+
+
+
+=======================================================================================================
+
+cara agar tidak mengkotori dashboardController.php dengan with() 
+
+1. buka file dashboardController.php dan hapus bagian with() contoh codingan nya : 
+with('user','coments.user')
+
+
+
+2. buka file idea.php dan berikan code ini :
+protected $with = ['user','coments.user'] ;
+
+
+
+
+========================================================================================================
+
+untuk case kita hanya membutuhkan id dan name saja dalam user yang berelasi dengan ideas dan tidak memerlukan email dan lain lain oleh sebab itu akan memperlambat kerja memori atau memakan banyak kapasitas oleh sebab itu kita hanya mengambil id dan name saja caranya adalah :
+
+
+1. buka file idea.php dan perbaiki code untuk bagian user nya seperti ini :
+    
+protected $with = ['user:id,name,image','coments.user:id,name,image'] ;
+
+
+
+
+
+
+
+
+
+
+
+
+

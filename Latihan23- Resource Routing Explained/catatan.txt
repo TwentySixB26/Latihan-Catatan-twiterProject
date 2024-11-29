@@ -1,0 +1,51 @@
+membuat resource controller,fungsi dari resource controller adalah untuk membuat controller yang berisikan destroy,create,edit,update dll dalam kasus sebelumnya yang mengunakan hal tersebut adalah ideaController oleh sebab itu akan mengunakan ideaController :
+
+
+
+1. buka file web.php dan tambahkan route ini 
+//except berfungsi agar yang tidak bisa dikendalikan atau dilakukan,maka hal hal teersebut hanya bisa dilakukan ketika sudah auth/login
+Route::resource('ideas', controller: IdeaController::class)->except(['index','create','show'])->middleware('auth');
+
+//only berarti bisa dilakukan kapan saja tanpa perlu auth
+Route::resource('ideas', controller: IdeaController::class)->only(['show']) ;
+
+
+//untuk coment
+Route::resource('ideas.coments', controller: ComentController::class)->only(['store'])->middleware('auth') ;
+
+
+
+
+2. komentari atau hapus code ini yang berhubungan dengan update,delete,create dll: 
+// Route::post('', [IdeaController::class , 'store'])->name('idea.create');
+// Route::get('/{idea}', [IdeaController::class , 'show']);
+
+
+// Route::delete('/{idea}', [IdeaController::class , 'destroy'])->middleware('auth');
+// Route::get('/{idea}/edit', [IdeaController::class , 'edit'])->middleware('auth');
+// Route::put('/{idea}', [IdeaController::class , 'update'])->middleware('auth');
+
+
+
+
+3. hapus juga bagian ini karena sudah tidak dibutuhkan lagi jika sudah mengunakan resource controller :
+Route::group(['prefix' => 'ideas/' , 'as' => 'ideas.'] , function() {
+    // Route::post('', [IdeaController::class , 'store'])->name('idea.create');
+    // Route::get('/{idea}', [IdeaController::class , 'show']);
+    Route::group(['middleware' => ['auth']],function(){
+        // Route::delete('/{idea}', [IdeaController::class , 'destroy'])->middleware('auth');
+        // Route::get('/{idea}/edit', [IdeaController::class , 'edit'])->middleware('auth');
+        // Route::put('/{idea}', [IdeaController::class , 'update'])->middleware('auth');
+        Route::post('/{idea}/coments', [ComentController::class , 'store'])->middleware('auth');
+    }) ;
+}) ;
+
+
+
+
+
+
+
+
+
+

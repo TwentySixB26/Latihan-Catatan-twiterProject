@@ -1,0 +1,130 @@
+cara membuat CRUD yang akan digunakan di website 
+
+1. buat migration dan model dengan nama Idea :
+php artisan make:model Idea -m
+
+
+
+2. buka file ..._create_ideas_table dan buat scema nya seperti ini :
+$table->id();
+$table->string('content') ;
+$table->unsignedBigInteger('likes')->default(0) ;
+$table->timestamps();
+
+
+3. lakukan migrasi dengan cara :
+php artisan migrate:fresh
+
+
+=============================================================================================
+
+
+cara memasukan data ke dalam database :
+
+1. buka file dashboardController.php dan berikan code ini pada method index(): 
+    public function index(){
+
+        $idea = new Idea() ;
+        $idea->content = 'test' ;
+        $idea->likes = 0 ;
+        $idea->save() ;
+
+        return view('dashboard') ;
+    }
+
+
+tapi akan menjadi problem ketika website direfresh akan membuat ulang data yang sudah dibuat maka itu dapat menimbulkan problem agar tidak terjadi seperti itu akan dibuat dengan cara yang lain,sementara pakai itu dlu 
+
+
+
+====================================================================================================
+
+cara lain menambahkan data
+
+
+1. buka Models/Idea.php 
+protected $guarded = ['id'];
+
+yang artinya hanya id yang tidak boleh diisi 
+
+
+
+2.  buka file dashboardController.php dan tambahkan code ini didalam method index() :
+public function index(){
+
+        $idea = new Idea([
+            'content' => 'test2',
+
+        ]) ;
+
+        $idea->save() ;
+        return view('dashboard',[
+            'ideas' => Idea::orderBy('created_at' , 'DESC')->get()
+        ]) ;
+}
+
+
+
+
+3. buka dashboard.blade.php dan lakukan pengulangan seperti ini untuk menampilkan data dari table content dan ini contoh codenya :
+@foreach ($ideas as $idea)
+    <div class="card-body">
+        <p class="fs-6 fw-light text-muted">
+            {{-- data diambil dari data base yaitu tabel ideas karena yang dikirim dari controller adalah Models tersbut  --}}
+            {{ $idea->content }}
+        </p>
+        <div class="d-flex justify-content-between">
+            <div>
+                <a href="#" class="fw-light nav-link fs-6">
+                    <span class="fas fa-heart me-1"> </span>
+                    {{ $idea->likes }}
+                </a>
+            </div>
+            <div>
+                <span class="fs-6 fw-light text-muted"> <span class="fas fa-clock"> </span> {{ $idea->created_at  }}</span>
+            </div>
+        </div>
+        <div>
+            <div class="mb-3">
+                <textarea class="fs-6 form-control" rows="1"></textarea>
+            </div>
+            <div>
+                <button class="btn btn-primary btn-sm"> Post Comment </button>
+            </div>
+
+            <hr>
+            <div class="d-flex align-items-start">
+                <img style="width:35px" class="me-2 avatar-sm rounded-circle"
+                    src="https://api.dicebear.com/6.x/fun-emoji/svg?seed=Luigi"
+                    alt="Luigi Avatar">
+                <div class="w-100">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="">Luigi
+                        </h6>
+                        <small class="fs-6 fw-light text-muted"> 3 hour ago</small>
+                    </div>
+                    <p class="fs-6 mt-3 fw-light">
+                        and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and
+                        Evil)
+                        by
+                        Cicero, written in 45 BC. This book is a treatise on the theory of ethics,
+                        very
+                        popular during the Renaissan
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+@endforeach
+
+
+
+
+
+
+
+
+
+
+
+

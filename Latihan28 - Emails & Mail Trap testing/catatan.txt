@@ -1,0 +1,65 @@
+1. buka terminal dan ketikan :
+php artisan make:mail WellcomeEmail
+
+
+
+2. buka file WellcomeEmail cari method envelope() dan juga content() lalu ganti code sebelumnya menjadi :
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Thanks For joining' . confiq('app.name',''),
+        );
+    }
+
+    public function content(): Content
+    {
+        return new Content(
+            view: 'emails.wellcome-email',
+        );
+    }
+
+
+
+
+3. buat view baru dengan nama wellcome-email.blade.php unutuk menangani bagian content dan isi yang ingin dilakukan
+
+
+
+
+
+4. buka kembali WellcomeEmail.php dan tambahkan beberapa code ini dan revisi beberapa codenya :
+
+private User $user ; 
+
+public function __construct(User $user)
+    {
+        $this->user = $user ; 
+    }
+
+public function content(): Content
+    {
+        return new Content(
+            view: 'emails.wellcome-email',
+            with:[
+                'user' => $this->user
+            ]
+        );
+    }
+
+
+
+
+
+5. buka file AuthController.php dan tambahkan code ini :
+
+Mail::to($user->email)
+    ->send(new WellcomeEmail($user)) ; 
+
+
+
+6. buka file .env 
+
+
+
+
+
