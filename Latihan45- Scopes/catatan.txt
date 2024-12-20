@@ -1,0 +1,68 @@
+1. buka file idea.php dan tambahkan code berikut :
+
+public function scopeSearch( $query , $search = '') {
+        $query->where('content', 'like' , '%' . $search . '%')  ;
+}
+
+
+//nama harus didepan nya scope karena agar dapat dibaca oleh laravel 
+
+
+
+
+
+2. buka file dashboardController.php dan ganti code sebelumnya dengan ini :
+ if (request('search')) {
+    $ideas = $ideas->search(request('search', ''));
+}
+
+
+
+
+
+3. buka file feedController.php dan ganti code sebelumnya menjadi ini :
+if (request('search')) {
+    $ideas = $ideas->search(request('search', ''));
+}
+
+
+
+
+==========================================================================
+
+
+ada cara yang lebih sederhana nya lagi yaitu dengan cara :
+
+1. buka file dashboardController.php dan tambahkan serta ganti code sebelumnya menjadi ini :
+
+$ideas->when(request()->has('search'),function($query){
+    $query->search(request('search', '')) ;
+}) ;
+
+
+
+
+
+
+2. buka file feedController.php dan tambahkan serta ganti code sebelumnya menjadi ini :
+
+$ideas->when(request()->has('search'),function($query){
+    $query->search(request('search', '')) ;
+}) ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

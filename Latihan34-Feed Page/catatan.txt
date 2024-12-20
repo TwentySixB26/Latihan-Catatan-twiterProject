@@ -1,0 +1,117 @@
+Feed page digunakan untuk ketika kita melihat idea/postingan orang lain akan sangat merepotkan jika menampilkan semuanya dan kita hanya menampilkan apa yang ingin kita follow saja.
+
+1. buka web.php dan buat route nya seperti ini:
+Route::get('/feed',FeedController::class)->middleware('auth')->name('feed') ;
+
+
+2. buka terminal dan buat controller baru seperti ini :
+php artisan make:controller FeedController --invokable
+
+
+//--invokable digunakan ketika Anda membuat controller menggunakan artisan command. Ini membuat controller yang invokable, artinya controller tersebut hanya memiliki satu metode, yaitu __invoke. Controller invokable biasanya digunakan untuk menangani logika yang sangat spesifik atau operasi sederhana.
+
+
+
+
+3. buka file FeedController.php dan tambahkan code ini :
+public function __invoke(Request $request)
+    {
+        $ideas = Idea::orderBy('created_at','DESC') ;
+
+        //jika ada data yang dikirim lewat form melalui input serach maka akan menimpa variabel $ideas
+        if (request('search')) {
+            $ideas = $ideas->where('content', 'like' , '%' . request('search') . '%')  ;
+        }
+
+        //mengembalikan data
+        return view('dashboard',[
+            'ideas' => $ideas->paginate(5),
+            //paginate() digunakan untuk berapa data yang ingin ditampilkan per page
+        ]) ;
+
+    }
+
+
+
+
+
+
+4. buka file side-bar.blade.php untuk menambahkan menu baru dengan menambahkan code ini:
+<li class="nav-item">
+    <a class="{{ Route::is('feed') ? 'text-white bg-primary rounded' : '' }} nav-link " href="{{ route('feed') }}">
+        <span>Feed</span>
+    </a>
+</li>
+
+
+
+
+
+
+5. buka kembali FeedController.php dan perbaiki code sebelumnya menjadi seperti ini :
+
+public function __invoke(Request $request)
+    {
+        $followingIDs = auth()->user()->followings()->pluck('user_id') ;
+
+        $ideas = Idea::whereIn('user_id' , $followingIDs)->latest() ;
+
+        //jika ada data yang dikirim lewat form melalui input serach maka akan menimpa variabel $ideas
+        if (request('search')) {
+            $ideas = $ideas->where('content', 'like' , '%' . request('search') . '%')  ;
+        }
+
+        //mengembalikan data
+        return view('dashboard',[
+            'ideas' => $ideas->paginate(5),
+            //paginate() digunakan untuk berapa data yang ingin ditampilkan per page
+        ]) ;
+
+    }
+
+
+
+
+// pluck() pada Laravel digunakan untuk mengambil satu kolom tertentu dari koleksi atau query hasil model dan mengembalikannya sebagai array. Ini sangat berguna untuk mendapatkan nilai dari kolom tertentu tanpa memerlukan seluruh data objek.
+
+// whereIn pada Laravel digunakan untuk memfilter data berdasarkan apakah suatu nilai ada dalam daftar tertentu. Metode ini sangat berguna ketika Anda ingin mengambil data yang memenuhi salah satu dari beberapa kemungkinan nilai.
+
+
+
+
+
+6. succes 
+
+
+
+
+================================================================================================================
+
+
+memperbaiki formating date 
+
+
+
+1. buka file ideaCard.blade.php dan perbaiki/tambahkan code ini :
+
+<div>
+    <span class="fs-6 fw-light text-muted"> 
+        <span class="fas fa-clock"> </span> {{ $idea->created_at->diffForHumans()  }}
+    </span>
+</div>
+
+
+//awalnya format data nya adalah 2024-01-11 berubah menjadi 2 week ago 
+
+
+
+
+
+
+
+
+
+
+
+
+

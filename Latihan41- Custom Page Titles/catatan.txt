@@ -1,0 +1,51 @@
+1. buka file layout.blade.php dan perbaiki code nya menjadi :
+<title>@yield('title')  </title>
+
+
+
+2. buka file dashboard.blade.php dan tambahkan code berikut :
+@section('title','dashboard')
+
+
+
+3. buka file terms.blade.php dan tambahkan code ini :
+@section('title','terms')
+
+
+
+4. buka file edit.blade.php dan tambahkan code ini :
+@section('title','edit')
+
+
+
+
+5. buka file ideas/show.blade.php dan tambahkan code ini :
+@section('title','show ideas')
+
+
+
+6. buka file user/show.blade.php dan tambahkan code ini :
+@section('title','show user')
+
+
+
+7. buka file login.blade.php dan tambahkan code ini :
+@section('title','login')
+
+
+
+8. buka file register.blade.php dan tambahkan code ini :
+@section('title','register')
+
+
+
+9. buka file admin/dashboard.blade.php dan tambahkan code ini :
+@section('title','admin/dashboard')
+
+
+
+
+
+
+
+

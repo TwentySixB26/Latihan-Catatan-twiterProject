@@ -1,0 +1,219 @@
+1. buka file web.php dan buat route baru seperti ini :
+Route::get('/admin',[DashboardController::class,'index'])->name('admin.dashboard') ;
+
+
+
+
+2. buka folder controller dan buat folder baru dengan nama 'Admin'
+
+
+
+3. buka terminal dan buat controller baru seperti ini dan diharuskan disimpan di folder admin:
+php artisan make:controller Admin/DashboardController
+
+
+
+4. buka file DashboardController.php yang ada di folder admin yang telah dibuat seperti tadi dan buat method seperti ini :
+public function index() {
+        return view('admin.dashboard') ;
+    }
+
+
+
+
+5. buka view dan buat folder admin dan di folder admin buat file yang bernama dashboard.blade.php 
+
+
+
+
+6. buka file DashboardController.blade.php yang telah dibuat tadi dan diisikan seperti ini :
+
+@extends('layout/layout')
+
+@section('content')
+    <h1>Admin panel</h1>
+@endsection
+
+
+
+
+
+
+7. buka file web.php kembali dan ubah route yang sebelumnya menjadi seperti ini :
+
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+
+Route::get('/admin',[AdminDashboardController::class,'index'])->middleware('auth')->name('admin.dashboard') ;
+
+
+
+
+
+8. buat migrasi baru dengan cara seperti ini :
+php artisan make:migration add_is_admin_to_users 
+
+
+
+
+9. buka ..add_is_admin_to_users dan tambahkan scema nya agar seperti ini :
+
+public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('is_admin')->default(false) ;
+        });
+    }
+
+
+
+public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_admin') ;
+        });
+    }
+
+
+
+
+
+10. buka terminal dan lakukan migrasi kembali dengann cara :
+php artisan migrate
+
+
+
+
+
+11. buka file Admin/DashboardController.php dan perbaiki code sebelumnya menjadi seperti ini :
+
+public function index() {
+
+        if(!auth()->user()->is_admin){
+            abort(403) ;
+        }
+
+        return view('admin.dashboard') ;
+    }
+
+
+
+
+12. buka terminal dan buat middleware seperti ini :
+php artisan make:middleware EnsureUserIsAdmin
+
+
+
+
+
+
+13. buka file EnsureUserIsAdmin dan tambahkan code ini :
+
+public function handle(Request $request, Closure $next): Response
+    {
+        Log::info('before code execution') ;
+        $response = $next($request) ;
+        Log::info('after Code execution') ;
+        return $response;
+    }
+
+
+
+
+
+
+
+
+14. buka file Admin/DashboardController.php dan perbaiki code nya pada method index() hingga menjadi seperti ini : 
+public function index() {
+
+        // if(!auth()->user()->is_admin){
+        //     abort(403) ;
+        // }
+
+        Log::info('inside admin dashboard controller') ;
+
+        return view('admin.dashboard') ;
+    }
+
+
+
+
+
+15. buka file kernel.php dan masuk ke protected $middlewareAliases  tambahkan code ini :
+
+'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+
+
+
+
+16. buka file web.php kembali perbaiki route yang menangani admin :
+
+Route::get('/admin',[AdminDashboardController::class,'index'])->middleware(['auth' , 'admin'])->name('admin.dashboard') ;
+
+
+
+
+
+
+
+17. buka folder Admin/DashboardController dan ubah kembali method index menjadi seperti ini : 
+public function index() {
+        return view('admin.dashboard') ;
+    }
+
+
+
+
+18. buka file EnsureUserIsAdmin dan ubah agar menjadi seperti ini :
+public function handle(Request $request, Closure $next): Response
+    {
+        if(!auth()->user()->is_admin){
+            abort(403) ;
+        }
+        return $next($request) ;
+    }
+
+
+
+
+19. buka terminal untuk mengupdate salah satu data untuk menjadi admin yaitu oniel@gmail.com tulisan : 
+php artisan tinker 
+
+
+
+
+20. masih di terminal dan ketikan :
+$u = User::find(1)
+
+
+
+21. $u->is_admin = 1
+
+
+
+22. $u->save()
+
+
+13. sukses
+
+
+=================================================================================
+
+menampilkan button admin untuk admin dan akan menghilangkanya jika bukan admin 
+
+1. buka file nav.blade.php dan tambahkan code ini dibagian auth atau user yang sedang login :
+@if (auth()->user()->is_admin)
+    <li class="nav-item">
+        <a class="nav-link {{ Route::is('admin') ? 'active' : '' }}" href="/admin">Admin</a>
+        {{-- Auth::user()->name  digunakan untuk mengambil nama yang sedang login --}}
+    </li>
+@endif
+
+
+
+
+2. sukses dibuat 
+
+
+
+

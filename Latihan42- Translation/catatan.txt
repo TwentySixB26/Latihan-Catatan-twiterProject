@@ -1,0 +1,72 @@
+menerjemahkan bahasa yang telah digunakan secara default oleh laravel
+
+1. buka file confiq/app.php dan ubah code ini jika ingin mengunakan bahasa lain :
+'locale' => 'id',  //bahasa yg digunakan sekarang 
+
+'fallback_locale' => 'en', //bahasa lain yang dapat diterjemahkan 
+
+
+
+===========================================================================
+
+mentranslate text menjadi bahasa lain 
+
+
+1. buka terminal dan ketikan :
+php artisan lang:publish 
+
+
+
+
+2. buka folder lang/en/ideas.php dan tambahkan code berikut:
+<?php
+
+return [
+    'login_to_share' => 'You not login' ,
+];
+
+
+
+
+
+
+3. buka file submitIdea.blade.php dan ganti sbelumnya dengan code ini :
+<h4> {{  __('ideas.login_to_share')}}</h4>
+
+
+bisa juga dengan code ini 
+<h4> @lang('ideas.login_to_share') </h4>
+
+
+
+
+
+4. buat folder baru didalam lang, yaitu id/ideas.php dan isikan codenya menjadi seperti ini :
+<?php
+
+return [
+    'login_to_share' => 'Kamu belum login' ,
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

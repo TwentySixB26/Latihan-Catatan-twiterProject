@@ -1,0 +1,83 @@
+memperbaiki agar jumlah total like nya 
+
+
+1. buka file dashboardController.php dan perbaiki method index(), tambahkan withCount():
+public function index(){
+
+        // $idea = new Idea([
+        //     'content' => 'test2',
+        // ]) ;
+        // $idea->save() ;
+
+        //mengambil data di database
+        $ideas = Idea::withCount('likes')->orderBy('created_at' , 'DESC') ;
+
+        //jika ada data yang dikirim lewat form melalui input serach maka akan menimpa variabel $ideas
+        if (request('search')) {
+            $ideas = $ideas->where('content', 'like' , '%' . request('search') . '%')  ;
+        }
+
+        //mengembalikan data
+        return view('dashboard',[
+            'ideas' => $ideas->paginate(5),
+            //paginate() digunakan untuk berapa data yang ingin ditampilkan per page
+        ]) ;
+}
+
+
+
+
+
+
+2. buka file like-button.blade.php dan perbaiki codenya agar menjadi seperti ini :
+
+<a href="/login" class="fw-light nav-link fs-6">
+    <span class="far fa-heart me-1"> </span>{{ $idea->likes_count }} 
+</a>
+
+
+//ubah semua yang berhubungan dengan count pada blade.php
+
+
+
+=======================================================================================================
+
+
+
+ketika mengunakan cara yang tadi maka akan terjadi eror pada jumlah like ketika melihat view detail dari postingan tersebut caranya untuk memperbaiki adalah :
+
+
+1. buka file dashboardController.php dan ubah code ini menjadi seperti semula :
+$ideas = Idea::orderBy('created_at' , 'DESC') ;
+
+
+
+
+2. buka file Idea.php dan tambahkan code ini :
+protected $withCount = ['likes'] ;
+
+
+//nama variabel nya jangan diganti karena itu sudah defaultnya dari laravel mengunakan $withCount 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

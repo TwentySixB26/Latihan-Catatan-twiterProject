@@ -1,0 +1,117 @@
+1. buka file web.php dan buat route baru seperti ini didalam rpute admin page :
+
+Route::get('/ideas',[AdminIdeaController::class,'index'])->name('ideas') ;
+
+
+
+
+
+2. buka terminal dan ketikan : 
+php artisan make:controller Admin/IdeaController
+
+
+
+
+
+
+3. buka file Admin/IdeaController.php dan buat method baru yaitu index() seperti berikut:
+
+public function index() {
+    $ideas = Idea::latest()->paginate(5);
+    return view('admin.ideas.index',compact('ideas')) ;
+}
+
+
+
+
+
+
+4. buka folder view dan buat file ini untuk menangani view nya admin/ideas/index.blade.php 
+
+
+
+
+
+
+5. buka folder admin/ideas/index.blade.php  dan tambahkan code berikut :
+@extends('layout/layout')
+
+@section('title','admin dashboard')
+
+
+@section('content')
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-3">
+                @include('admin/shared/leftSideBar')
+            </div>
+            <div class="col-9">
+                <h1>Ideas dashboard</h1>
+
+                <table class="table table-striped mt-4">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Content</th>
+                            <th>Created At</th>
+                            <th>#</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach ($ideas as $idea)
+                            <tr>
+                                <td>{{ $idea->id }}</td>
+                                <td>{{ $idea->user->name }}</td>
+                                <td>{{ $idea->content }}</td>
+                                <td>{{ $idea->created_at->toDateString() }}</td>
+                                <td>
+                                    <a href="/ideas/{{ $idea->id }}"> View </a>
+                                    <a href="/ideas/{{ $idea->id }}/edit" class="ms-1"> Edit </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                <div>
+                    {{ $ideas->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+
+
+
+
+
+
+
+6. buka folder view admin/shared/leftSideBar.blade.php dan tambahkan code berikut :
+
+<li class="nav-item">
+    <a class="{{ Route::is('admin.ideas') ? 'text-white bg-primary rounded' : '' }} nav-link " href="{{ route('admin.ideas') }}">
+        <span>Ideas</span>
+    </a>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,104 @@
+pada bab ini akan memperbaiki dari bab sebelumnya karena kita membuat dua yaitu edit dan delete padahal masih dalam satu lingkup yang berupa idea oleh sebab itu akan memperbaikinya dengan cara ini 
+
+
+1. buka terminal dan ketikan :
+php artisan make:policy IdeaPolicy --model=Idea 
+
+
+//di Laravel digunakan untuk membuat file policy baru yang terkait dengan model tertentu, dalam hal ini model Idea
+
+//Policy di Laravel adalah sebuah mekanisme yang digunakan untuk mendefinisikan izin akses (authorization) pada tindakan tertentu yang dapat dilakukan oleh pengguna terhadap model atau sumber daya (resource). Policies memungkinkan Anda untuk memisahkan logika otorisasi dari controller dan model, sehingga kode menjadi lebih terstruktur dan mudah dikelola.
+
+
+
+
+2. buka file IdeaPolicy.php dan komentari method view , viewany , create , restore dan fordelete. itu dikomentari/hapus karena tidak terpakai 
+
+
+
+
+
+3. buka file IdeaPolicy.php dan tambahkan code ini pada method update dan delete :
+
+public function update(User $user, Idea $idea): bool
+    {
+        return ($user->is_admin || $user->id === $idea->user_id) ;
+    }
+
+
+
+public function delete(User $user, Idea $idea): bool
+    {
+        return ($user->is_admin || $user->id === $idea->user_id) ;
+    }
+
+
+
+
+
+4. buka file AuthServiceProvider.php dan hapus/komentari Gate delete dan edit :
+// Gate::define('idea.delete',function(User $user , Idea $idea):bool{
+//     return ((bool) $user->is_admin || $user->id === $idea->user_id) ;
+// }) ;
+
+// Gate::define('idea.edit',function(User $user , Idea $idea):bool{
+//     return ((bool) $user->is_admin || $user->id === $idea->user_id) ;
+// }) ;
+
+
+
+
+5. buka file ideaController.php dan buka method destroy,edit diganti yang didalamnya sepeti ini :
+$this->authorize('delete', $idea);   //di method delete
+
+$this->authorize('update', $idea); //di edit 
+
+
+
+
+
+6. jadi alurnya adalah 
+- kita mengakses ideaController terlebih dahulu 
+- masuk ke methodnya contohnya method destroy didalam method destroy terdapat code $this->authorize('delete', $idea); maka akan melempar ke IdeaPolicy namanya $idea harus sesuai dengan IdeaPolicy sesuai yg ada didb mana yang ingin dijadikan atau dibatasi
+- setelah itu melempar ke IdeaPolicy karena tadi yang dilempar adalah delete maka akan mengeksekusi code 
+public function delete(User $user, Idea $idea): bool
+{
+    return ($user->is_admin || $user->id === $idea->user_id) ;
+}
+
+
+dan itulah alurnya 
+
+
+
+
+========================================================================================================
+
+
+penamaan ideaPolicy 
+default namanya adalah IdeaPolicy , idea diambil sesuai dari db dan policy adalah nama yang sudah ditetapkan oleh laravel agar langsung terbaca,lantas bagaimana jika ingin menganti nya menjadi IdeaPermissions ? itu harus dilakukan beberapa setting caranya adalah :
+
+
+1. buka file AuthServiceProvider.php dan dan buka property  $policies 
+protected $policies = [
+    //siapa pun yang melawati class dan memberitau yang akan digunakan sebagai kebijakan(policy) 
+    Idea::class => IdeaPermissions::class 
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

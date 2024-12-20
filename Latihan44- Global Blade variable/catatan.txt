@@ -1,0 +1,114 @@
+memperbaiki Dashboard agar dapat direkomendasikan akun mana yang harus di follow 
+
+
+1. buka file followBox.blade.php dan hapus code ini :
+<div class="hstack gap-2 mb-3">
+    <div class="avatar">
+        <a href="#!"><img class="avatar-img rounded-circle" src="https://api.dicebear.com/6.x/fun-emoji/svg?seed=Mario" alt=""></a>
+    </div>
+    <div class="overflow-hidden">
+        <a class="h6 mb-0" href="#!">Mario Brother</a>
+        <p class="mb-0 small text-truncate">@Mario</p>
+    </div>
+    <a class="btn btn-primary-soft rounded-circle icon-md ms-auto" href="#">
+        <i class="fa-solid fa-plus"> </i>
+    </a>
+</div>
+<div class="d-grid mt-3">
+    <a class="btn btn-sm btn-primary-soft" href="#!">Show More</a>
+</div>
+
+
+
+
+
+
+2. buka file dashboardController.php buka method index() dan tambahkan code ini:
+
+$topUsers = User::withCount('ideas')->orderBy('ideas_count','DESC')->limit(5)->get() ;   //ini yang ditambahkan atau baru
+
+return view('dashboard',[
+    'ideas' => $ideas->paginate(5),
+    'top_users' => $topUsers ,      //ini yang ditambahkan atau baru 
+]) ;
+
+
+
+
+
+
+
+
+3. buka file followBox.blade.php kembali dan ganti code sebelumnya dengan ini :
+ @foreach ($top_users as $user )
+    <div class="hstack gap-2 mb-3">
+        <div class="avatar">
+            <a href="users/{{ $user->id }}">
+                <img style="width: 50px" class="avatar-img rounded-circle" src="{{ $user->getImageURL() }}" alt="">
+             </a>
+        </div>
+        <div class="overflow-hidden">
+                    <a class="h6 mb-0" href="users/{{ $user->id }}">{{ $user->name }}</a>
+                    <p class="mb-0 small text-truncate">{{ $user->email }}</p>
+        </div>
+        <a class="btn btn-primary-soft rounded-circle icon-md ms-auto" href="users/{{ $user->id }}">
+            <i class="fa-solid fa-plus"> </i>
+        </a>
+    </div>
+@endforeach
+
+
+
+
+
+
+
+4. buka file ideaController.php dan masuk ke method show tambahkan code ini/perbaiki codenya agar seperti ini :
+
+ $topUsers = User::withCount('ideas')->orderBy('ideas_count','DESC')->limit(5)->get() ;
+
+return view('ideas/show',[
+    'idea' => $idea,
+    'top_users' => $topUsers ,
+]) ;
+
+
+//lakukan hal tersebut di semua route seperti edit dll 
+
+
+
+=========================================================================================================
+
+memperbaiki nomer 4 
+
+
+tapi hal pada nomer 4 bab sebelumnya  akan merepotkan karena jika ada yang salah maka kita harus mengeditnya satu persatu cara lain nya adalah agar satu code dapat digunakan diberbagai tempat adalah :
+
+
+
+1. buka file appServiceProvider.php buka method boot() dan tambahkan code ini :
+
+View::share('top_users', User::withCount('ideas')->orderBy('ideas_count','DESC')->limit(5)->get() ) ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

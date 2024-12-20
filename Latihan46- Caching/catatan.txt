@@ -1,0 +1,40 @@
+fungsinya kurang lebih seperti ini,misal saya punya daftar peringkat dan si c peringkat 2 tapi seiring berjalan nya waktu dia nilai nya paling tinggi dan menjadi peringkat 1 dalam rentan waktu 2 menit tapi di laravel nya mengunakan 60 * 3 maka si b masih peringkat 2 sebelum waktunya 3 menit
+
+
+
+
+1. buka file AppServiceProvider dan ganti code sebelumnya dengan code ini pada method boot():
+
+$topUsers = Cache::remember('topUsers', 60 * 2 , function () {
+    return  User::withCount('ideas')->orderBy('ideas_count','DESC')->limit(5)->get() ;
+});
+
+View::share('top_users' , $topUsers) ;
+
+
+//untuk waktunya juga bisa mengunakan 'now()->addDays(10)'  maka data akan otomatis direload dalam 10 hari 
+
+
+
+
+
+2. tambahkan code ini juga pada AppServiceProvider.php untuk merefresh/hapus Cache :
+cache()->forget('topUsers') ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,63 @@
+1. buka folder view/admin/dashboard.blade.php dan tambahkan code berikut: 
+<div class="row">
+    <div class="col-sm-6 col-md-4">
+        @include('shared.widget',[
+            'title' => 'total users' ,
+            'icon' => 'fas fa-users' ,
+            'data' => $totalUsers
+        ])
+    </div>
+    <div class="col-sm-6 col-md-4">
+        @include('shared.widget',[
+            'title' => 'total Idea' ,
+            'icon' => 'fas fa-lightbulb' ,
+            'data' => $totalIdeas
+        ])
+    </div>
+    <div class="col-sm-6 col-md-4">
+        @include('shared.widget',[
+            'title' => 'total Coment' ,
+            'icon' => 'fas fa-comment' ,
+            'data' => $totalComments
+        ])
+    </div>
+</div>
+
+
+
+
+
+
+2. buat folder baru di view/shared/widget.blade.php dan tambahkan code berikut untuk menangani include yang diatas:
+<div class="card">
+    <div class="card-body">
+        <p> <span class="{{ $icon }}"></span> {{ $title }}</p>
+        <h2 class="fw-bold fs-2">{{ $data }}</h2>
+    </div>
+</div>
+
+
+
+
+
+
+3. buka file controller/admin/dashboardController.php dan tambahkan atau perbaiki code berikut :
+public function index() {
+        $totalUsers = User::count() ;
+        $totalIdeas = Idea::count() ;
+        $totalComments = Coment::count() ;
+
+        return view('admin.dashboard', compact('totalUsers','totalIdeas','totalComments')) ;
+    }
+
+
+
+
+
+
+
+
+
+
+
+

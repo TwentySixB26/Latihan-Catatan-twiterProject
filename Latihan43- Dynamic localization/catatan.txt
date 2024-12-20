@@ -1,0 +1,97 @@
+1. buka file AppServiceProvider.php dan masuk ke method boot() serta tambahkan code ini :
+ public function boot(): void
+    {
+        app()->setLocale('es') ; //digunakan untuk mengubah pengaturan bahasa aplikasi ke bahasa,pada case ini es adalah spanyol
+        paginator::useBootstrapFive();
+    }
+
+//bisa juga mengunakan code ini :
+
+use Illuminate\Support\Facades\App;
+
+App::setLocale('fr') ;
+
+
+
+=====================================================================================
+
+membuat settingan untuk beberapa bahasa,misalnya ingin beralih bahasa dari ingris ke indonesia di pengaturan caranya adalah :
+
+
+
+1. buka file leftSiideBar.blade.php dan tambahkan code ini :
+<div class="card-footer text-center py-2">
+        <a class="btn btn-link btn-sm" href="{{ route('profile') }}">en </a>
+        <a class="btn btn-link btn-sm" href="{{ route('profile') }}">es </a>
+</div>
+
+
+
+
+
+2. buka file web.php dan tambahkan route berikut :
+
+Route::get('lang/{lang}', function($lang){
+    app()->setLocale($lang) ;
+    session()->put('locale',$lang) ;
+    return redirect('/') ;
+}) ;
+
+
+
+
+
+3. buka terminal dan ketik : 
+php artisan make:middleware SetLocale
+
+//untuk namanya bebas tapi diharapkan seperti itu saja 
+
+
+
+
+4. buka file setLocale.php dan tambahkan code beirkut :
+
+    public function handle(Request $request, Closure $next): Response
+    {
+        if (session()->has('locale')) {
+            app()->setLocale(session()->get('locale')) ; 
+        }
+        return $next($request);
+    }
+
+
+
+
+5. buka file kernel.php cari bagian protected $middlewareGroups dan bagian web,jadi runtutan nya seperti ini :
+protected $middlewareGroups = [
+    'web' => [
+        //code nya ditambahkan disini 
+        \App\Http\Middleware\SetLocale::class,
+    ],
+]
+
+
+
+
+
+6. buka file leftSiideBar.blade.php dan perbaiki code sebelumnya menjadi :
+<div class="card-footer text-center py-2">
+        <a class="btn btn-link btn-sm" href="/lang/en">en </a>
+        <a class="btn btn-link btn-sm" href="/lang/id">id </a>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

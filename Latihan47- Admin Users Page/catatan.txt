@@ -1,0 +1,188 @@
+1. buka file view/admin/dashboard.blade.php dan perbaiki agar codenya menjadi seperti berikut : 
+
+@extends('layout/layout')
+
+@section('title','admin dashboard')
+
+@section('content')
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-3">
+                @include('shared/leftSideBar')
+            </div>
+            <div class="col-9">
+                <h1>admin dashboard</h1>
+            </div>
+        </div>
+    </div>
+@endsection
+
+
+
+
+
+
+2. buat folder baru didalam admin yaitu shared/leftSidebar.blade.php dan copy isinya dan edit beberapa yang perlu diedit seperti ini :
+
+<div class="card overflow-hidden">
+    <div class="card-body pt-3">
+        <ul class="nav nav-link-secondary flex-column fw-bold gap-2">
+            <li class="nav-item">
+                <a class="{{ Route::is('admin.dashboard') ? 'text-white bg-primary rounded' : '' }} nav-link " href="{{ route('admin.dashboard') }}">
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="{{ Route::is('admin.users') ? 'text-white bg-primary rounded' : '' }} nav-link " href="{{ route('admin.users') }}">
+                    <span>users</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-footer text-center py-2">
+        <a class="btn btn-link btn-sm" href="/lang/en">en </a>
+        <a class="btn btn-link btn-sm" href="/lang/id">id </a>
+    </div>
+</div>
+
+
+
+
+
+3. buka file web.php dan tambahkan code ini untuk menangani route admin atau sebelumnya sudah membuat route tapi diganti dengan route yang baru yaitu ini :
+
+Route::middleware(['auth', 'can:admin'])->prefix('/admin')->as('admin.')->group(function(){
+    Route::get('/',[AdminDashboardController::class,'index'])->name('dashboard') ;
+    Route::get('/users',[AdminUserController::class,'index'])->name('users') ;
+}) ;
+
+
+
+
+
+
+4. buat controller baru untuk menangani user yg ada didalam folder admin dengan nama file UserController.php mengunakan php artisan 
+
+
+
+
+5. buka file controller/Admin/UserController.php dan tambahkan code berikut : 
+public function index() {
+        return view('admin.users.index') ;
+}
+
+
+
+
+
+
+6. buka folder view dan buat folder baru baru didalam folder admin/users/index.blade.php 
+
+
+
+
+
+
+
+7. buka folder admin/users/index.blade.php dan tambahkan code berikut :
+
+@extends('layout/layout')
+
+@section('title','admin dashboard')
+
+@section('content')
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-3">
+                @include('admin/shared/leftSideBar')
+            </div>
+            <div class="col-9">
+                <h1>Users dashboard</h1>
+
+                <table class="table table-striped mt-4">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Joined At</th>
+                            <th>#</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach ($users as $user)
+                            <tr>
+                                <td>{{ $user->id }}</td>
+                                <td>{{ $user->name }}</td>
+                                <td>{{ $user->email }}</td>
+                                <td>{{ $user->created_at->toDateString() }}</td>
+                                <td>
+                                    <a href="/users/{{ $user->id }}"> View </a>
+                                    <a href="/users/{{ $user->id }}/edit" class="ms-1"> Edit </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                <div>
+                    {{ $users->links() }}
+                </div>
+
+            </div>
+        </div>
+    </div>
+@endsection
+
+
+
+
+
+
+
+8. buka file controller/Admin/UserController.php dan buka method index() serta perbaiki codenya seperti ini:
+
+public function index() {
+    $users = User::latest()->paginate(5);
+    return view('admin.users.index',compact('users')) ;
+}
+
+
+
+
+
+
+
+9. buka file userPolicy.php untuk menangani agar admin dapat mengedit siapa saja dan tambahkan code berikut pada method update():
+
+return $user->is_admin || $user->is($model);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

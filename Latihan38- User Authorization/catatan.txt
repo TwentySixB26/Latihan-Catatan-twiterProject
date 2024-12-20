@@ -1,0 +1,71 @@
+mengatasi agar ketika user yang sedang login tidak bisa membuka buka atau mengedit dari user lain jika yang login tidak sesuai dengan user yang ingin di edit 
+
+
+1. buka terminal dan ketikan : 
+php artisan make:policy UserPolicy --model=user
+
+
+
+
+2. buka file UserPolicy.php dan hapus method viewAny,view, create,restore,forDelete
+
+
+
+
+3. masih di file UserPolicy.php masuk ke method update,berikan code ini :
+public function update(User $user, User $model): bool
+    {
+        return $user->is($model);
+    }
+
+
+
+
+4. buka file userController.php dan masuk ke method edit dan update tambahkan code ini:
+$this->authorize('update',$user) ;
+
+
+
+5. sukses 
+
+
+
+
+===========================================================================================================
+memperbaiki user-card.blade.php agar tidak mengunakan Auth::id() === $user->id tapi mengunakan @can
+
+
+1. buka file user-card.blade.php dan perbaiki code sebelumnya agar menjadi :
+@can('update', $user)
+    <a href="/users/{{ $user->id }}/edit"> Edit </a>
+@endcan
+
+
+
+karena sebelumnya adalah :
+@if(auth()->user()->id === $user->id)
+    <a href="/users/{{ $user->id }}/edit"> Edit </a>
+@endif
+
+
+tapi fungsinya sama saja 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,167 @@
+memindahkan form validasi seperti password minimal 8 huruf,nama harus request atau lain lain 
+
+
+1. buka terminal dan ketikan :
+php artisan make:request UpdateUserRequest
+
+
+//Form Request Class adalah kelas khusus untuk memvalidasi permintaan HTTP yang masuk, terutama pada bagian data input dari pengguna. Dengan menggunakan Form Request, Anda bisa memindahkan logika validasi dari controller ke dalam kelas terpisah sehingga kode menjadi lebih terorganisir.
+
+
+
+
+2. buka file UpdateUserRequest dan buka method authorize dan ubah return nya menyadi true seperti ini :
+return true;
+
+
+
+
+3. buka file UserController.php dan buka method update perbaiki codenya agar seperti ini,seperti menambahkan parameter dan beberapa code :
+
+public function update(UpdateUserRequest $request,User $user)
+    {
+        $this->authorize('update',$user) ;
+        $validated = $request->validated();
+
+        if ($request->has('image')) {
+            //untuk memasukan img ke file storage
+            $imagePath = $request->file('image')->store('profile','public') ;
+
+            //validated['image'] di isi dengan imagePath untuk namanya, jadi hasilnya nama di db nya adalah storage/gambar yang dikirm.jpg
+            $validated['image'] = $imagePath ;
+
+            Storage::disk('public')->delete($user->image ?? '') ;
+        } ;
+
+        $user->update($validated) ;
+        return redirect('/profile') ;
+    }
+
+//tambahkan ini : UpdateUserRequest $request
+//ganti : request() dengan $request 
+//tambahkan ini: $validated = $request->validated();
+
+
+
+
+4. validate yang ada di UserController.php di method update dipindahkan ke dalam UpdateUserRequest.php  pada method rules :
+
+public function rules(): array
+    {
+        return [
+            'name' => 'required|min:3|max:40' ,
+            'bio' => 'nullable|min:1|max:255',
+            'image' => 'image'
+        ];
+    }
+
+
+
+
+
+==================================================================================================
+
+
+
+1. buka terminal dan ketikan :
+php artisan make:request CreateIdeaRequest 
+
+
+
+2. buka file CreateIdeaRequest dan buka method authorize dan ubah return nya menyadi true seperti ini :
+return true;
+
+
+
+
+
+3. buka CreateIdeaRequest.php dan masuk ke method rules dan perbaiki codenya agar menjadi seperti ini :
+
+public function rules(): array
+    {
+        return [
+            'content' => 'required|max:240'
+        ];
+    }
+
+
+
+
+
+4. buka ideacontroller dan masuk ke method stire ubah codenya agar menjadi seperti ini :
+ public function store(CreateIdeaRequest $request) {
+        //melakukan validasi data
+        $validated = $request->validated();
+
+        //user_id akan diambil ketika anda sudah login dan akan diisi sesuai dengan yg sedang login
+        $validated["user_id"] = auth()->id();
+
+
+        //memasukan data ke db
+        Idea::create($validated) ;
+
+        //melakukan redirect ketika code sebelumnya dieksekusi entah sukses atau gagal
+        return redirect('/')->with('success', 'Post succesfuly create') ;
+    }
+
+
+
+
+===============================================================================
+
+
+1. buka terminal dan ketikan :
+php artisan make:request UpdateIdeaRequest
+
+
+
+2. buka file UpdateIdeaRequest dan buka method authorize dan ubah return nya menyadi true seperti ini :
+return true;
+
+
+
+3. buka UpdateIdeaRequest.php dan masuk ke method rules dan perbaiki codenya agar menjadi seperti ini :
+public function rules(): array
+    {
+        return [
+            'content' => 'required|max:240'
+        ];
+    }
+
+
+
+
+4. buka ideacontroller dan masuk ke method update ubah codenya agar menjadi seperti ini :
+public function update( UpdateIdeaRequest $request,Idea $idea) {
+
+        //jika user yang login tidak sesuai dengan postingan yg berleasi dengan idea maka tidak bisa melakukan destroy,edit,update
+        if (auth()->id() !== $idea->user_id) {
+            abort(404) ;
+        }
+
+        //melakukan validasi data
+        $validated = $request->validated() ;
+
+        // data yang telah lolos validasi maka disimpan divariabel
+        // $idea->content = request()->get('content') ;
+
+        //melakukan save atau mengirim data ke database
+        $idea->update($validated) ;
+
+        return redirect('/idea' .'/' . $idea->id)->with('success', 'Post succesfuly updated') ;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

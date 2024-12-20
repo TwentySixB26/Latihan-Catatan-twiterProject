@@ -1,0 +1,179 @@
+1. buka file web.php dan tambahkan route baru untuk bagian admin page seperti ini :
+Route::get('/coments',[AdminComentController::class,'index'])->name('coments') ;
+
+
+
+
+
+2. buka terminal dan buat controller baru seperti ini: 
+php artisan make:controller Admin/comentController
+
+
+
+
+
+
+
+3. buka file Admin/comentController.php dan buat method index :
+ public function index() {
+        $comments = Coment::latest()->paginate(5);
+        return view('admin.comment.index',compact('comments')) ;
+    }
+
+
+
+
+
+4. buat view untuk menangani coment admin/coment/index.blade.php 
+
+
+
+
+5. buka file admin/coment/index.blade.php dan isikan codenya berikut :
+@extends('layout/layout')
+
+@section('title','admin dashboard')
+
+
+@section('content')
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-3">
+                @include('admin/shared/leftSideBar')
+            </div>
+            <div class="col-9">
+                <h1>Coments dashboard</h1>
+                @include('shared.success')
+                <table class="table table-striped mt-4">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Idea</th>
+                            <th>Content</th>
+                            <th>Created At</th>
+                            <th>#</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach ($comments as $coment)
+                            <tr>
+                                <td>{{ $coment->id }}</td>
+                                <td>{{ $coment->user->name }}</td>
+                                <td>{{ $coment->idea->id }}</td>
+                                <td>{{ $coment->coment }}</td>
+                                <td>{{ $coment->created_at->toDateString() }}</td>
+                                <td>
+                                    -
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
+                <div>
+                    {{ $comments->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+
+
+
+
+
+
+
+6. buka file admin/shared/leftSideBar.blade.php dan  tambahkan code berikut :
+<li class="nav-item">
+    <a class="{{ Route::is('admin.coments') ? 'text-white bg-primary rounded' : '' }} nav-link " href="{{ route('admin.coments') }}">
+        <span>Coments</span>
+    </a>
+</li>
+
+
+
+=========================================================================================================
+memperbaiki agar nama bisa diklik pada tabel dashboard yg ada di page admin
+
+
+1. buka file admin/coment/index.blade.php dan perbaiki codenya agar  menjadi seperti ini :
+
+<td>
+    <a href="/users/{{$coment->user->id}}">{{ $coment->user->name }}</a>
+</td>
+<td>
+    <a href="/ideas/{{ $coment->idea->id }}"> {{ $coment->idea->id }} </a>
+</td>
+
+
+
+
+
+
+
+2. buka file   admin/ideas/index.blade.php dan perbaiki code seblumnya dengan ini :
+<td>
+    <a href="/users/{{$idea->user->id}}">{{ $idea->user->name }}</a>
+</td>
+
+
+
+
+
+
+
+===================================================================================================
+
+membuat delete coment 
+
+
+
+1. buka file Admin/comentController.php dan tambahkan method ini : 
+public function destroy(Coment $coment){
+        $coment->delete() ;
+        return redirect('/admin/coments')->with('success', 'coment succesfuly delete');
+    }
+
+
+
+
+
+
+2. buka file web.php dan tambahkan code ini pada bagian admin page :
+Route::delete('/coments/{coment}/delete', [AdminComentController::class, 'destroy'])->name('delete');
+
+
+
+
+
+
+3. buka file  admin/coment/index.blade.php dan perbaiki code sebelumnya dengan code berikut :
+<td>
+    <form action="/admin/coments/{{$coment->id}}/delete" method="post">
+        @csrf
+        @method('delete')
+        <button class="btn btn-danger" type="submit"> Delete Coment</button>
+    </form>
+</td>
+
+
+
+
+
+
+4. suksesss
+
+
+
+
+
+
+
+
+
+
+

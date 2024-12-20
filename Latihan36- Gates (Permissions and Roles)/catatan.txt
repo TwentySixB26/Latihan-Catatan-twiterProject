@@ -1,0 +1,141 @@
+1. buka file AuthServiceProvider.php dan berikan code ini pada method boot() :
+
+Gate::define('admin',function(User $user):bool {
+            return (bool) $user->is_admin ;
+        }) ;
+
+
+
+
+// Gate:: adalah fitur dalam Laravel yang digunakan untuk mendefinisikan dan mengelola kebijakan otorisasi (authorization). Gate memungkinkan Anda menentukan apakah pengguna tertentu memiliki izin untuk melakukan tindakan tertentu pada aplikasi.
+
+
+//define() digunakan untuk mendefinisikan aturan otorisasi (authorization rules) pada Gate. Dengan define(), Anda membuat aturan khusus yang menentukan apakah pengguna tertentu diizinkan untuk melakukan tindakan tertentu pada aplikasi Anda.
+
+
+
+
+2. buka file web.php dan perbaiki route admin menjadi seperti ini :
+Route::get('/admin',[AdminDashboardController::class,'index'])->middleware(['auth' ])->name('admin.dashboard') ;
+
+
+
+
+3. hapus file EnsureUserIsAdmin yg telah dibuat pada bab sebelumnya
+
+
+
+
+4. buka file kernel.php dan hapus/komentari code ini :
+'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+
+
+
+
+
+5. buka folder Admin/dashboardController.php dan berikan code ini :
+
+public function index() {
+        if (!Gate::allows('admin')) {
+            abort(403) ;
+        }
+        return view('admin.dashboard') ;
+    }
+
+
+
+6. sukses dilakukan, hampir sama fungsinya seperti yang bab sebelumnya tapi ini mengunakan Gate
+
+
+
+
+==========================================================================================
+
+tapi fungsi pada nomor 5 yang diatas tersebut akan merepotkan karena kita diharuskan memasang setiap kali dibutuhkan, ada cara lain agar satu kali definisi dapat dijalanka dimana saja  
+
+1. buka file dashboardController.php dan hapus bagian ini pada method index():        
+if (!Gate::allows('admin')) {
+            abort(403) ;
+        }
+
+
+
+2. buka file web.php dan perbaiki route nya seperti ini :
+Route::get('/admin',[AdminDashboardController::class,'index'])->middleware(['auth','can:admin' ])->name('admin.dashboard') ;
+
+
+
+//can adalah sebuah metode atau directive yang digunakan untuk memeriksa apakah pengguna yang sedang diautentikasi memiliki izin tertentu. Hal ini berkaitan dengan sistem Authorization di Laravel, yang memungkinkan Anda mengelola izin pengguna dengan menggunakan Gate atau Policy.
+
+
+=======================================================================================================
+
+
+memrevisi gate/gerbang untuk menangani ketika edit atau delete,jadi semisal yang login adalah user dengan id 3 maka tidak bisa mengedit user dengan id 5 dan akan menampilkan halaman 403 
+
+
+1. buka file AuthServiceProvider dan tambahkan code seperti berikut :
+
+Gate::define('idea.delete',function(User $user , Idea $idea):bool{
+    return ((bool) $user->is_admin || $user->id === $idea->user_id) ;
+}) ;
+
+Gate::define('idea.edit',function(User $user , Idea $idea):bool{
+    return ((bool) $user->is_admin || $user->id === $idea->user_id) ;
+}) ;
+
+
+
+
+2. buka file ideaController dan buka method edit beserta destroy dan hapus/komentari code berikut : 
+
+if (auth()->id() !== $idea->user_id) {
+    abort(404) ;
+}
+
+
+
+
+
+
+3. tambahkan code   $this->authorize('idea.delete')  pada method destroy dan edit, dan seperti ini full codenya : 
+
+public function edit(Idea $idea) {
+
+       $this->authorize('idea.edit', $idea);
+
+        $editing = true ;
+        return view('ideas/show',[
+            'idea' => $idea,
+            'editing' => $editing
+        ]) ;
+    }
+
+
+ public function destroy(Idea $idea)
+    {
+
+        $this->authorize('idea.delete', $idea);
+        // Idea::destroy($idea->id) ;
+        $idea->delete() ;
+        return redirect('/')->with('success', 'Post succesfuly deletedddd') ;
+    }
+
+
+
+
+
+
+
+4. 
+
+
+
+
+
+
+
+
+
+
+
