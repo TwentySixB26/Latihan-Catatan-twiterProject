@@ -1,11 +1,11 @@
 1. buka file AuthServiceProvider.php dan berikan code ini pada method boot() :
 
 Gate::define('admin',function(User $user):bool {
-            return (bool) $user->is_admin ;
-        }) ;
+     return (bool) $user->is_admin ;
+}) ;
 
 
-
+//'admin' adalah nama yang nantinya dapat digunakan 
 
 // Gate:: adalah fitur dalam Laravel yang digunakan untuk mendefinisikan dan mengelola kebijakan otorisasi (authorization). Gate memungkinkan Anda menentukan apakah pengguna tertentu memiliki izin untuk melakukan tindakan tertentu pada aplikasi.
 
@@ -125,9 +125,14 @@ public function edit(Idea $idea) {
 
 
 
+=============================================================================================================
 
+CATATAN!
 
-4. 
+Gunakan Gate::allows() ketika kamu ingin memeriksa akses secara umum berdasarkan gate tanpa melibatkan model.
+
+Gunakan $this->authorize() ketika kamu ingin memeriksa otorisasi terkait dengan operasi terhadap model atau resource tertentu, dan pastikan kamu sudah mendefinisikan policy untuk model tersebut.
+
 
 
 

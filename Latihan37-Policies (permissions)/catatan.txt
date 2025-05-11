@@ -56,7 +56,6 @@ $this->authorize('update', $idea); //di edit
 
 
 
-
 6. jadi alurnya adalah 
 - kita mengakses ideaController terlebih dahulu 
 - masuk ke methodnya contohnya method destroy didalam method destroy terdapat code $this->authorize('delete', $idea); maka akan melempar ke IdeaPolicy namanya $idea harus sesuai dengan IdeaPolicy sesuai yg ada didb mana yang ingin dijadikan atau dibatasi
